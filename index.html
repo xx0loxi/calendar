@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Notes - Волшебный блокнот</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+    <div class="app">
+        <header>
+            <div class="logo" id="logo">
+                <i class="fas fa-sparkles"></i>
+                <h1>Magic Notes</h1>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle-btn" class="magic-btn" title="Переключить тему">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="add-note-btn" class="magic-btn primary">
+                    <i class="fas fa-plus"></i> Новая заметка
+                </button>
+            </div>
+        </header>
+        
+        <div class="notes-container" id="notes-container"></div>
+    </div>
+
+    <div class="particles-container" id="particles"></div>
+    <div class="ripple-container" id="ripples"></div>
+
+    <audio id="magic-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-902.mp3" preload="auto"></audio>
+    <audio id="delete-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

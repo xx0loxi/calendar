@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const body = document.body;
     
-    // Создаем элемент для фона полноэкранного режима
+    // Создаем элемент для фона полноэкранного
     const backdrop = document.createElement('div');
     backdrop.className = 'fullscreen-backdrop';
     document.body.appendChild(backdrop);
@@ -207,3 +207,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+

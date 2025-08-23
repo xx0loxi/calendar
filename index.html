@@ -1,43 +1,90 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Умный блокнот</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Розклад занять БН-П-2</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="light-theme">
-    <div class="app">
+<body>
+    <div class="container">
         <header>
-            <h1><i class="fas fa-book-open"></i> Умный блокнот</h1>
-            <div class="header-actions">
-                <button id="search-btn" title="Поиск">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button id="theme-toggle-btn" title="Темная тема">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button id="add-note-btn">
-                    <i class="fas fa-plus"></i>
-                    <span class="desktop-text">Новая заметка</span>
-                </button>
+            <div class="header-content">
+                <h1>БН-П-2 Розклад</h1>
+                <div class="month-nav">
+                    <button id="prev-month" class="nav-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <h2 id="current-month">Вересень</h2>
+                    <button id="next-month" class="nav-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </header>
-        
-        <div class="search-container hidden" id="search-container">
-            <input type="text" id="search-input" placeholder="Поиск заметок...">
-            <button id="close-search-btn">
-                <i class="fas fa-times"></i>
-            </button>
+
+        <main>
+            <div class="calendar-wrapper">
+                <div class="weekdays">
+                    <div>Пн</div>
+                    <div>Вт</div>
+                    <div>Ср</div>
+                    <div>Чт</div>
+                    <div>Пт</div>
+                    <div>Сб</div>
+                    <div>Нд</div>
+                </div>
+                <div class="days" id="calendar-days">
+                    <!-- Дни будут добавлены через JavaScript -->
+                </div>
+            </div>
+        </main>
+
+        <div class="schedule-modal" id="schedule-modal">
+            <div class="modal-backdrop" id="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-date">Розклад на 1 вересня</h3>
+                    <button class="close-btn" id="close-modal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="day-schedule" id="day-schedule">
+                        <!-- Расписание будет добавлено через JavaScript -->
+                    </div>
+                    <div class="attendance-summary" id="attendance-summary">
+                        <!-- Статистика посещений -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-attendance" class="save-btn">
+                        <span>Зберегти</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
-        
-        <div class="notes-container" id="notes-container">
-            <!-- Заметки будут добавляться здесь -->
+
+        <div class="floating-stats">
+            <div class="stats-item">
+                <span class="stats-label">Відвідано</span>
+                <span class="stats-value" id="stats-present">0</span>
+            </div>
+            <div class="stats-item">
+                <span class="stats-label">Пропущено</span>
+                <span class="stats-value" id="stats-absent">0</span>
+            </div>
         </div>
     </div>
-
-    <div class="fullscreen-backdrop"></div>
 
     <script src="script.js"></script>
 </body>

@@ -36,7 +36,7 @@ body {
 .container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 16px;
+    padding: 12px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -47,8 +47,8 @@ header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
-    margin-bottom: 20px;
-    padding: 20px;
+    margin-bottom: 16px;
+    padding: 16px;
     box-shadow: var(--shadow);
     animation: slideDown 0.6s ease;
 }
@@ -58,12 +58,12 @@ header {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
 }
 
 h1 {
     color: var(--primary-color);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
 }
@@ -71,7 +71,7 @@ h1 {
 .month-nav {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .nav-btn {
@@ -79,8 +79,8 @@ h1 {
     color: white;
     border: none;
     border-radius: 12px;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -99,12 +99,25 @@ h1 {
     transform: translateY(0);
 }
 
+.month-year {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
 .month-nav h2 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--dark-color);
-    min-width: 120px;
     text-align: center;
+}
+
+#current-year {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    font-weight: 500;
+    margin-top: 2px;
 }
 
 /* Main content */
@@ -127,11 +140,11 @@ main {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .weekdays div {
-    padding: 16px 0;
+    padding: 14px 0;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -146,8 +159,8 @@ main {
 
 .day {
     background: white;
-    min-height: 70px;
-    padding: 12px;
+    min-height: 60px;
+    padding: 10px;
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -175,10 +188,10 @@ main {
 .day.has-classes::before {
     content: '';
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 8px;
-    height: 8px;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
     background: var(--primary-color);
     border-radius: 50%;
     animation: pulse 2s infinite;
@@ -190,14 +203,14 @@ main {
 }
 
 .day-number {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 4px;
     color: var(--dark-color);
 }
 
 .day-subject {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     line-height: 1.2;
     color: var(--gray-500);
     overflow: hidden;
@@ -209,20 +222,20 @@ main {
 
 .day-absence-count {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
+    bottom: 6px;
+    right: 6px;
     background: var(--accent-color);
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.75rem;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     animation: bounceIn 0.6s ease;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);
 }
 
 /* Модальное окно */
@@ -236,7 +249,7 @@ main {
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 16px;
+    padding: 12px;
 }
 
 .modal-backdrop {
@@ -267,13 +280,13 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px;
+    padding: 20px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
 }
 
 .modal-header h3 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 
@@ -292,19 +305,19 @@ main {
 }
 
 .modal-body {
-    padding: 24px;
+    padding: 20px;
     max-height: 60vh;
     overflow-y: auto;
 }
 
 .day-schedule {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .schedule-item {
-    padding: 16px;
+    padding: 14px;
     border-radius: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     background: var(--gray-100);
     border-left: 4px solid var(--primary-color);
     transition: all 0.3s ease;
@@ -325,7 +338,7 @@ main {
     font-weight: 600;
     color: var(--primary-color);
     margin-bottom: 6px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .schedule-item.absent .schedule-time {
@@ -335,7 +348,7 @@ main {
 .schedule-subject {
     font-weight: 600;
     margin-bottom: 6px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--dark-color);
 }
 
@@ -343,28 +356,28 @@ main {
     display: flex;
     justify-content: space-between;
     color: var(--gray-500);
-    font-size: 0.9rem;
-    margin-bottom: 12px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
 }
 
 .attendance-toggle {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding-top: 8px;
     border-top: 1px solid var(--gray-200);
 }
 
 .attendance-toggle label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--gray-600);
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .attendance-toggle input {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     accent-color: var(--accent-color);
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -381,34 +394,34 @@ main {
 
 .attendance-summary {
     background: var(--gray-100);
-    padding: 20px;
+    padding: 16px;
     border-radius: 12px;
     animation: fadeIn 0.6s ease;
 }
 
 .attendance-summary h4 {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     color: var(--dark-color);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .summary-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
 }
 
 .summary-total {
     font-weight: 700;
     border-top: 2px solid var(--gray-300);
-    padding-top: 12px;
-    margin-top: 12px;
+    padding-top: 10px;
+    margin-top: 10px;
     color: var(--dark-color);
 }
 
 .modal-footer {
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-top: 1px solid var(--gray-200);
     text-align: right;
 }
@@ -417,10 +430,10 @@ main {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 20px;
     border-radius: 12px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -440,56 +453,9 @@ main {
 
 .empty-schedule {
     text-align: center;
-    padding: 40px 20px;
+    padding: 30px 16px;
     color: var(--gray-500);
     font-style: italic;
-}
-
-/* Floating stats */
-.floating-stats {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 16px;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    animation: slideUp 0.6s ease;
-    z-index: 100;
-}
-
-.stats-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 16px;
-}
-
-.stats-item:first-child {
-    border-right: 1px solid var(--gray-200);
-}
-
-.stats-label {
-    font-size: 0.8rem;
-    color: var(--gray-500);
-    margin-bottom: 4px;
-}
-
-.stats-value {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--dark-color);
-}
-
-#stats-present {
-    color: var(--success-color);
-}
-
-#stats-absent {
-    color: var(--accent-color);
 }
 
 /* Анимации */
@@ -525,107 +491,37 @@ main {
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .container {
-        padding: 12px;
-    }
-    
-    header {
-        padding: 16px;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    h1 {
-        font-size: 1.3rem;
-    }
-    
-    .month-nav h2 {
-        font-size: 1.2rem;
-    }
-    
-    .nav-btn {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .weekdays div {
-        padding: 14px 0;
-        font-size: 0.8rem;
-    }
-    
-    .day {
-        min-height: 60px;
-        padding: 10px;
-    }
-    
-    .day-number {
-        font-size: 1rem;
-    }
-    
-    .day-subject {
-        font-size: 0.7rem;
-    }
-    
-    .day-absence-count {
-        width: 18px;
-        height: 18px;
-        font-size: 0.7rem;
-    }
-    
-    .modal-content {
-        max-height: 85vh;
-    }
-    
-    .modal-header {
-        padding: 20px;
-    }
-    
-    .modal-body {
-        padding: 20px;
-        max-height: 50vh;
-    }
-    
-    .schedule-item {
-        padding: 14px;
-    }
-    
-    .floating-stats {
-        bottom: 16px;
-        right: 16px;
-        padding: 14px;
-    }
-    
-    .stats-item {
-        padding: 0 12px;
-    }
-}
-
+/* Адаптивность для мобильных */
 @media (max-width: 480px) {
     .container {
         padding: 8px;
     }
     
     header {
-        padding: 14px;
-        margin-bottom: 16px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
     }
     
     h1 {
         font-size: 1.2rem;
+        text-align: center;
     }
     
     .month-nav {
-        gap: 12px;
+        gap: 10px;
     }
     
     .month-nav h2 {
         font-size: 1.1rem;
-        min-width: 100px;
+    }
+    
+    #current-year {
+        font-size: 0.8rem;
     }
     
     .nav-btn {
@@ -635,7 +531,7 @@ main {
     
     .weekdays div {
         padding: 12px 0;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
     }
     
     .day {
@@ -656,8 +552,8 @@ main {
         width: 16px;
         height: 16px;
         font-size: 0.65rem;
-        bottom: 6px;
-        right: 6px;
+        bottom: 4px;
+        right: 4px;
     }
     
     .modal-header {
@@ -670,45 +566,53 @@ main {
     
     .modal-body {
         padding: 16px;
+        max-height: 55vh;
     }
     
     .schedule-item {
         padding: 12px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     
     .schedule-time {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .schedule-subject {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
     
     .schedule-details {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     
     .attendance-toggle {
-        gap: 10px;
+        gap: 8px;
     }
     
     .attendance-toggle label {
+        font-size: 0.8rem;
+    }
+    
+    .attendance-summary {
+        padding: 14px;
+    }
+    
+    .attendance-summary h4 {
+        font-size: 0.95rem;
+    }
+    
+    .summary-item {
         font-size: 0.85rem;
     }
     
-    .floating-stats {
-        bottom: 12px;
-        right: 12px;
-        padding: 12px;
+    .modal-footer {
+        padding: 14px 16px;
     }
     
-    .stats-label {
-        font-size: 0.75rem;
-    }
-    
-    .stats-value {
-        font-size: 1.1rem;
+    .save-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
     }
 }
 
@@ -734,18 +638,7 @@ main {
         padding: 10px;
     }
     
-    .floating-stats {
-        flex-direction: column;
-        gap: 8px;
-        right: 50%;
-        transform: translateX(50%);
-        min-width: 140px;
-    }
-    
-    .stats-item:first-child {
-        border-right: none;
-        border-bottom: 1px solid var(--gray-200);
-        padding-bottom: 8px;
-        margin-bottom: 8px;
+    .modal-content {
+        max-height: 85vh;
     }
 }

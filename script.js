@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Элементы DOM
     const calendarDays = document.getElementById('calendar-days');
     const currentMonthElement = document.getElementById('current-month');
+    const currentYearElement = document.getElementById('current-year');
     const prevMonthButton = document.getElementById('prev-month');
     const nextMonthButton = document.getElementById('next-month');
     const scheduleModal = document.getElementById('schedule-modal');
@@ -16,8 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const attendanceSummary = document.getElementById('attendance-summary');
     const saveAttendanceButton = document.getElementById('save-attendance');
     const closeModalButton = document.getElementById('close-modal');
-    const statsPresent = document.getElementById('stats-present');
-    const statsAbsent = document.getElementById('stats-absent');
     
     // Расписание занятий
     const scheduleData = {
@@ -60,9 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedDate = null;
     let selectedDayOfWeek = null;
     
-    // Статистика
-    let totalStats = { present: 0, absent: 0 };
-    
     // Генерация календаря
     function generateCalendar() {
         calendarDays.innerHTML = '';
@@ -76,7 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
             "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
             "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
         ];
+        
+        // Обновляем и месяц и год
         currentMonthElement.textContent = months[currentMonth];
+        currentYearElement.textContent = currentYear;
         
         // Дни предыдущего месяца
         for (let i = firstDayIndex; i > 0; i--) {
@@ -93,8 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 1; i <= daysLeft; i++) {
             createDay(i, true);
         }
-        
-        updateStats();
     }
     
     function createDay(day, isOtherMonth) {
@@ -141,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedDayOfWeek = dayOfWeek;
         
         const date = new Date(currentYear, currentMonth, day);
-        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         modalDate.textContent = `Розклад на ${date.toLocaleDateString('uk-UA', options)}`;
         
         renderSchedule();
@@ -203,26 +200,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>${totalLessons} пар (${percentage}%)</span>
             </div>
         `;
-    }
-    
-    // Общая статистика
-    function updateStats() {
-        totalStats = { present: 0, absent: 0 };
-        
-        Object.values(absenceData).forEach(dayAbsences => {
-            totalStats.absent += dayAbsences.length;
-        });
-        
-        // Подсчет всех пар в расписании
-        let totalLessons = 0;
-        Object.values(scheduleData).forEach(daySchedule => {
-            totalLessons += daySchedule.length;
-        });
-        
-        totalStats.present = totalLessons - totalStats.absent;
-        
-        statsPresent.textContent = totalStats.present;
-        statsAbsent.textContent = totalStats.absent;
     }
     
     // Сохранить отметки

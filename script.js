@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Текущая дата
+
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
     let currentYear = currentDate.getFullYear();
@@ -399,3 +399,4 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(showVersion, 2000);
     }
 });
+

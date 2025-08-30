@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Текущая дата
-    let currentDate = new Date();
-    let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
+    let currentYear = new Date().getFullYear();
+    let currentMonth = 8; // Вересень
+    let currentDate = new Date(currentYear, currentMonth, 1);
     
     // Элементы DOM
     const calendarDays = document.getElementById('calendar-days');
@@ -60,6 +60,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузить отметки о пропусках
     let absenceData = JSON.parse(localStorage.getItem('absenceData')) || {};
     
+    // Функция для подсчета пропусков за месяц
+    function getMonthlyAbsences(year, month) {
+        let count = 0;
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= lastDay; day++) {
+            const dateKey = `${year}-${month + 1}-${day}`;
+            if (absenceData[dateKey]) {
+                count += absenceData[dateKey].length;
+            }
+        }
+        return count;
+    }
+    
     // Выбранная дата и день недели
     let selectedDate = null;
     let selectedDayOfWeek = null;
@@ -81,6 +94,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Обновляем и месяц и год
         currentMonthElement.textContent = months[currentMonth];
         currentYearElement.textContent = currentYear;
+        
+        // Подсчет и отображение пропусков за месяц
+        const absences = getMonthlyAbsences(currentYear, currentMonth);
+        if (absences > 0) {
+            currentMonthElement.classList.add('has-absences');
+            let countSpan = currentMonthElement.querySelector('.absence-count');
+            if (!countSpan) {
+                countSpan = document.createElement('span');
+                countSpan.classList.add('absence-count');
+                currentMonthElement.appendChild(countSpan);
+            }
+            countSpan.textContent = `${absences}`;
+        } else {
+            currentMonthElement.classList.remove('has-absences');
+            const countSpan = currentMonthElement.querySelector('.absence-count');
+            if (countSpan) countSpan.remove();
+        }
         
         // Дни предыдущего месяца
         for (let i = firstDayIndex; i > 0; i--) {

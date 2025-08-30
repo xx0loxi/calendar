@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Текущая дата
+    // Текуща дата
     let currentYear = new Date().getFullYear();
     let currentMonth = 8; // Вересень
     let currentDate = new Date(currentYear, currentMonth, 1);
@@ -186,8 +186,12 @@ document.addEventListener('DOMContentLoaded', function() {
         scheduleModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
-        // Скрыть версию в углу при открытии модального окна
-        if (versionCorner) versionCorner.classList.add('hide');
+        // Скрыть версию только на мобильных
+        if (versionCorner) {
+            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                versionCorner.classList.add('hide');
+            }
+        }
 
         // Вибрация при открытии (на мобильных)
         if ('vibrate' in navigator) {
@@ -285,8 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
         scheduleModal.style.display = 'none';
         document.body.style.overflow = 'auto';
 
-        // Показать версию в углу при закрытии модального окна
-        if (versionCorner) versionCorner.classList.remove('hide');
+        // Показать версию только на мобильных
+        if (versionCorner) {
+            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                versionCorner.classList.remove('hide');
+            }
+        }
     }
     
     // Показать версию

@@ -2,9 +2,24 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Розклад БН-П-2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4a6fa5">
+    <meta name="msapplication-navbutton-color" content="#4a6fa5">
+    <meta name="msapplication-TileColor" content="#4a6fa5">
     <title>Розклад занять БН-П-2</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Иконки для мобильных устройств -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    
+    <!-- Предзагрузка критических ресурсов -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="script.js" as="script">
 </head>
 <body>
     <div class="container">
@@ -97,13 +112,9 @@
 
     <!-- Перемещённый и обновлённый блок версии в правый нижний угол -->
     <div class="version-corner" id="version-corner">
-        <span>v2.3.2</span>
+        <span>v2.3.1.6</span>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-

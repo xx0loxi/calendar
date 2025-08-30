@@ -1,442 +1,1205 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Текуща дата
-    let currentYear = new Date().getFullYear();
-    let currentMonth = 8; // Вересень
-    let currentDate = new Date(currentYear, currentMonth, 1);
-    
-    // Элементы DOM
-    const calendarDays = document.getElementById('calendar-days');
-    const currentMonthElement = document.getElementById('current-month');
-    const currentYearElement = document.getElementById('current-year');
-    const prevMonthButton = document.getElementById('prev-month');
-    const nextMonthButton = document.getElementById('next-month');
-    const scheduleModal = document.getElementById('schedule-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const modalDate = document.getElementById('modal-date');
-    const dateBadge = document.getElementById('date-badge');
-    const daySchedule = document.getElementById('day-schedule');
-    const attendanceSummary = document.getElementById('attendance-summary');
-    const saveAttendanceButton = document.getElementById('save-attendance');
-    const closeModalButton = document.getElementById('close-modal');
-    const versionInfo = document.getElementById('version-info');
-    const mobileIndicator = document.querySelector('.mobile-indicator');
-    const versionCorner = document.getElementById('version-corner');
-    
-    // Расписание занятий
-    const scheduleData = {
-        "1": [ // Понеділок
-            { time: "9:00-10:20", subject: "МОБ", room: "301", teacher: "Вирста" },
-            { time: "10:30-11:50", subject: "Буріння свердловин", room: "103", teacher: "Агейчева" },
-            { time: "12:00-13:20", subject: "Буріння свердловин", room: "103", teacher: "Агейчева" }
-        ],
-        "2": [ // Вівторок
-            { time: "9:00-10:20", subject: "Технічна механіка", room: "302", teacher: "Волинець" },
-            { time: "10:30-11:50", subject: "Промивка свердловин", room: "307А", teacher: "Деркунська" },
-            { time: "12:00-13:20", subject: "МОБ", room: "301", teacher: "Вирста" }
-        ],
-        "3": [ // Середа
-            { time: "9:00-10:20", subject: "МОБ", room: "301", teacher: "Вирста" },
-            { time: "10:30-11:50", subject: "Фізичне виховання", room: "с/з", teacher: "Кошель" },
-            { time: "12:00-13:20", subject: "ЗНПГ", room: "202", teacher: "Сакова" },
-            { time: "13:30-14:50", subject: "Іноземна (ЗПС)", room: "316", teacher: "Почтакова" }
-        ],
-        "4": [ // Четвер
-            { time: "9:00-10:20", subject: "Технічна механіка", room: "302", teacher: "Волинець" },
-            { time: "10:30-11:50", subject: "Гідравліка", room: "310", teacher: "Чмихун" },
-            { time: "12:00-13:20", subject: "Гідравліка", room: "310", teacher: "Чмихун" }
-        ],
-        "5": [ // П'ятниця
-            { time: "9:00-10:20", subject: "Промивка свердловин", room: "307А", teacher: "Деркунська" },
-            { time: "10:30-11:50", subject: "ЗНПГ", room: "202", teacher: "Сакова" },
-            { time: "12:00-13:20", subject: "Буріння свердловин", room: "103", teacher: "Агейчева" }
-        ]
-    };
-    
-    // Дни недели на украинском
-    const weekdays = [
-        "Неділя", "Понеділок", "Вівторок", "Середа", 
-        "Четвер", "П'ятниця", "Субота"
-    ];
-    
-    // Загрузить отметки о пропусках
-    let absenceData = JSON.parse(localStorage.getItem('absenceData')) || {};
-    
-    // Функция для подсчета пропусков за месяц
-    function getMonthlyAbsences(year, month) {
-        let count = 0;
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        for (let day = 1; day <= lastDay; day++) {
-            const dateKey = `${year}-${month + 1}-${day}`;
-            if (absenceData[dateKey]) {
-                count += absenceData[dateKey].length;
-            }
-        }
-        return count;
-    }
-    
-    // Выбранная дата и день недели
-    let selectedDate = null;
-    let selectedDayOfWeek = null;
-    
-    // Генерация календаря
-    function generateCalendar() {
-        calendarDays.innerHTML = '';
-        
-        const firstDay = new Date(currentYear, currentMonth, 1);
-        const lastDay = new Date(currentYear, currentMonth + 1, 0);
-        const firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-        const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-        
-        const months = [
-            "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
-            "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
-        ];
-        
-        // Обновляем и месяц и год
-        currentMonthElement.textContent = months[currentMonth];
-        currentYearElement.textContent = currentYear;
-        
-        // Подсчет и отображение пропусков за месяц
-        const absences = getMonthlyAbsences(currentYear, currentMonth);
-        if (absences > 0) {
-            currentMonthElement.classList.add('has-absences');
-            let countSpan = currentMonthElement.querySelector('.absence-count');
-            if (!countSpan) {
-                countSpan = document.createElement('span');
-                countSpan.classList.add('absence-count');
-                currentMonthElement.appendChild(countSpan);
-            }
-            countSpan.textContent = `${absences}`;
-        } else {
-            currentMonthElement.classList.remove('has-absences');
-            const countSpan = currentMonthElement.querySelector('.absence-count');
-            if (countSpan) countSpan.remove();
-        }
-        
-        // Дни предыдущего месяца
-        for (let i = firstDayIndex; i > 0; i--) {
-            createDay(prevLastDay - i + 1, true);
-        }
-        
-        // Дни текущего месяца
-        for (let i = 1; i <= lastDay.getDate(); i++) {
-            createDay(i, false);
-        }
-        
-        // Дни следующего месяца
-        const daysLeft = 42 - (firstDayIndex + lastDay.getDate());
-        for (let i = 1; i <= daysLeft; i++) {
-            createDay(i, true);
-        }
-        
-        // Скрываем подсказку о свайпе после первого использования
-        if (localStorage.getItem('swipeHintSeen')) {
-            mobileIndicator.classList.add('hidden');
-        }
-    }
-    
-    function createDay(day, isOtherMonth) {
-        const dayElement = document.createElement('div');
-        dayElement.classList.add('day');
-        if (isOtherMonth) dayElement.classList.add('other-month');
-        
-        const dateObj = new Date(currentYear, currentMonth, day);
-        const dayOfWeek = dateObj.getDay();
-        const normalizedDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
-        
-        const hasClasses = !isOtherMonth && normalizedDayOfWeek <= 5 && scheduleData[normalizedDayOfWeek];
-        const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-        const dayAbsences = absenceData[dateKey] || [];
-        
-        let dayContent = `<div class="day-number">${day}</div>`;
-        
-        if (hasClasses) {
-            const subjects = scheduleData[normalizedDayOfWeek];
-            for (let j = 0; j < Math.min(2, subjects.length); j++) {
-                dayContent += `<div class="day-subject">${subjects[j].subject}</div>`;
-            }
-            dayElement.classList.add('has-classes');
-            
-            if (dayAbsences.length > 0) {
-                dayContent += `<div class="day-absence-count">${dayAbsences.length}</div>`;
-                dayElement.classList.add('absence-marked');
-            }
-            
-            dayElement.addEventListener('click', () => openSchedule(day, normalizedDayOfWeek));
-            dayElement.style.cursor = 'pointer';
-        } else {
-            dayElement.style.cursor = 'default';
-        }
-        
-        dayElement.innerHTML = dayContent;
-        calendarDays.appendChild(dayElement);
-    }
-    
-    // Открыть расписание
-    function openSchedule(day, dayOfWeek) {
-        selectedDate = `${currentYear}-${currentMonth + 1}-${day}`;
-        selectedDayOfWeek = dayOfWeek;
+:root {
+    --primary-color: #4a6fa5;
+    --primary-light: #6b8cbc;
+    --primary-dark: #3a5a80;
+    --accent-color: #ff6b6b;
+    --accent-light: #ff8e8e;
+    --accent-dark: #e55a5a;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --dark-color: #2d3748;
+    --light-color: #f8f9fa;
+    --gray-100: #f7fafc;
+    --gray-200: #edf2f7;
+    --gray-300: #e2e8f0;
+    --gray-400: #cbd5e0;
+    --gray-500: #a0aec0;
+    --gray-600: #718096;
+    --border-radius: 20px;
+    --border-radius-sm: 12px;
+    --shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 12px 35px rgba(0, 0, 0, 0.15);
+    --shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
 
-        const date = new Date(currentYear, currentMonth, day);
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        modalDate.textContent = `Розклад на ${date.toLocaleDateString('uk-UA', options)}`;
-        dateBadge.textContent = weekdays[date.getDay()];
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 
-        renderSchedule();
-        scheduleModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+    color: var(--dark-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        // Скрыть версию только на мобильных
-        if (versionCorner) {
-            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                versionCorner.classList.add('hide');
-            }
-        }
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-        // Вибрация при открытии (на мобильных)
-        if ('vibrate' in navigator) {
-            navigator.vibrate(50);
-        }
-    }
-    
-    function renderSchedule() {
-        daySchedule.innerHTML = '';
-        
-        if (scheduleData[selectedDayOfWeek]) {
-            const dayAbsences = absenceData[selectedDate] || [];
-            
-            scheduleData[selectedDayOfWeek].forEach((lesson, index) => {
-                const isAbsent = dayAbsences.includes(index);
-                const scheduleItem = document.createElement('div');
-                scheduleItem.classList.add('schedule-item');
-                if (isAbsent) scheduleItem.classList.add('absent');
-                
-                scheduleItem.innerHTML = `
-                    <div class="schedule-time">${lesson.time}</div>
-                    <div class="schedule-subject">${lesson.subject}</div>
-                    <div class="schedule-details">
-                        <span>Ауд. ${lesson.room}</span>
-                        <span>${lesson.teacher}</span>
-                    </div>
-                    <div class="attendance-toggle">
-                        <input type="checkbox" id="absence-${index}" data-lesson="${index}" ${isAbsent ? 'checked' : ''}>
-                        <label for="absence-${index}">Відмітити як пропущену</label>
-                    </div>
-                `;
-                daySchedule.appendChild(scheduleItem);
-            });
-            
-            updateAttendanceSummary(dayAbsences.length, scheduleData[selectedDayOfWeek].length);
-        } else {
-            daySchedule.innerHTML = '<div class="empty-schedule">В цей день пар немає</div>';
-            attendanceSummary.innerHTML = '';
-        }
-    }
-    
-    // Обновить статистику
-    function updateAttendanceSummary(absencesCount, totalLessons) {
-        const presentCount = totalLessons - absencesCount;
-        const percentage = totalLessons > 0 ? Math.round((presentCount / totalLessons) * 100) : 0;
-        
-        attendanceSummary.innerHTML = `
-            <h4>Відвідуваність</h4>
-            <div class="summary-item">
-                <span>Присутній:</span>
-                <span>${presentCount} пар</span>
-            </div>
-            <div class="summary-item">
-                <span>Відсутній:</span>
-                <span>${absencesCount} пар</span>
-            </div>
-            <div class="summary-item summary-total">
-                <span>Всього:</span>
-                <span>${totalLessons} пар (${percentage}%)</span>
-            </div>
-        `;
-    }
-    
-    // Сохранить отметки
-    function saveAttendance() {
-        if (selectedDate) {
-            const checkboxes = document.querySelectorAll('.attendance-toggle input');
-            const absences = [];
-            
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    absences.push(parseInt(checkbox.dataset.lesson));
-                }
-            });
-            
-            if (absences.length > 0) {
-                absenceData[selectedDate] = absences;
-            } else {
-                delete absenceData[selectedDate];
-            }
-            
-            localStorage.setItem('absenceData', JSON.stringify(absenceData));
-            generateCalendar();
-            closeModal();
-            
-            // Вибрация при сохранении
-            if ('vibrate' in navigator) {
-                navigator.vibrate(100);
-            }
-        }
-    }
-    
-    // Закрыть модальное окно
-    function closeModal() {
-        scheduleModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+/* Header */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-        // Показать версию только на мобильных
-        if (versionCorner) {
-            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                versionCorner.classList.remove('hide');
-            }
-        }
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    font-size: 2rem;
+    animation: bounce 2s infinite;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.month-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.nav-btn:hover::before {
+    left: 100%;
+}
+
+.nav-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+.nav-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.month-year {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 110px;
+}
+
+.month-nav h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    text-align: center;
+}
+
+#current-year {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Main content */
+main {
+    flex: 1;
+}
+
+.calendar-wrapper {
+    background: linear-gradient(135deg, #f8fafc 80%, #e2e8f0 100%);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 8px 32px rgba(76,110,165,0.10);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.weekdays div {
+    padding: 16px 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px; /* Добавлен отступ между днями */
+    background-color: var(--gray-200);
+}
+
+.day {
+    background: white;
+    min-height: 70px;
+    padding: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease;
+    border: 1px solid transparent;
+    border-radius: 14px; /* Только закругление, без тени и сложных градиентов */
+}
+
+.day:hover {
+    background: linear-gradient(135deg, #f7fafc 90%, #e2e8f0 100%);
+    box-shadow: 0 6px 24px 0 rgba(76,110,165,0.13);
+}
+
+.day.other-month {
+    background: linear-gradient(135deg, #f7fafc 80%, #e2e8f0 100%);
+    color: #bfc8e6;
+    opacity: 0.7;
+}
+
+.day.absence-marked {
+    background: linear-gradient(135deg, #fff5f5 80%, #ffe6e6 100%);
+    border: 2px solid #ff8e8e;
+}
+
+.day-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--dark-color);
+}
+
+.day-subject {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: var(--gray-600);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-weight: 500;
+}
+
+.day-absence-count {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* Карточки расписания — белый фон, мягкая тень, закругление, отступы */
+.schedule-item {
+    background: #fff;
+    color: var(--dark-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    padding: 18px;
+    transition: box-shadow 0.2s, background 0.2s;
+    position: relative;
+}
+
+.schedule-item.absent {
+    background: #fff5f5;
+    border-left-color: var(--accent-color);
+}
+
+.schedule-item:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-item:hover {
+    box-shadow: 0 8px 24px 0 rgba(76,110,165,0.13);
+    background: #f7fafc;
+}
+
+/* Отступы между карточками */
+.day-schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 24px;
+}
+
+/* Версия в правом нижнем углу — всегда видна, минимализм */
+.version-corner {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1100;
+    background: rgba(44, 62, 80, 0.92);
+    color: #fff;
+    padding: 10px 28px;
+    border-radius: 22px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 18px rgba(44,62,80,0.18);
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1), background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+.version-corner.hide {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(30px) scale(0.97);
+}
+
+/* Модальное окно */
+.schedule-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+.schedule-modal[style*="display: flex"] {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.4s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-modal);
+    position: relative;
+    z-index: 1001;
+    animation: modalSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 22px !important;
+    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.18);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+.modal-title {
+    flex: 1;
+}
+
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.date-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: 16px;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+}
+
+.day-schedule {
+    margin-bottom: 24px;
+}
+
+.schedule-item {
+    background: #fff;
+    color: var(--dark-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    padding: 18px;
+    transition: box-shadow 0.2s, background 0.2s;
+    position: relative;
+}
+
+.schedule-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%);
+}
+
+.schedule-item:hover::before {
+    animation: shimmer 1.5s;
+}
+
+.schedule-item:hover {
+    background: linear-gradient(135deg, #f7fafc 90%, #e2e8f0 100%);
+    box-shadow: 0 8px 24px 0 rgba(76,110,165,0.13);
+}
+
+.schedule-item.absent {
+    background: #fff5f5;
+    border-left-color: var(--accent-color);
+}
+
+.schedule-time {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.schedule-time::before {
+    content: '🕒';
+    font-size: 0.9em;
+}
+
+.schedule-item.absent .schedule-time {
+    color: #ff6b6b;
+}
+
+.schedule-subject {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+    color: var(--dark-color);
+    line-height: 1.4;
+}
+
+.schedule-details {
+    display: flex;
+    justify-content: space-between;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.schedule-details span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.schedule-details span::before {
+    font-size: 0.9em;
+}
+
+.schedule-details span:first-child::before {
+    content: '🏢';
+}
+
+.schedule-details span:last-child::before {
+    content: '👤';
+}
+
+.attendance-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 8px;
+}
+
+.attendance-toggle input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.attendance-toggle input:checked {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.attendance-toggle label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    flex: 1;
+}
+
+.attendance-toggle input:checked + label {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.attendance-summary {
+    background: linear-gradient(135deg, #f8fafc 80%, #e2e8f0 100%);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    padding: 20px;
+    border-radius: var(--border-radius-sm);
+    animation: fadeIn 0.6s ease;
+    border: 1px solid var(--gray-200);
+    border-radius: 18px !important;
+}
+
+.attendance-summary h4 {
+    margin-bottom: 16px;
+    color: var(--dark-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-total {
+    font-weight: 800;
+    border-top: 2px solid var(--gray-300);
+    padding-top: 12px;
+    margin-top: 12px;
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+/* Фон-подложка под кнопкой сохранить */
+.modal-footer {
+    padding: 0;
+    border-top: none;
+    text-align: center;
+    position: static;
+    background: #f8fafc;
+    box-shadow: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    margin-top: 24px;
+}
+
+.save-btn {
+    margin: 0 auto;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.10);
+    border-radius: 18px !important;
+    transition: background 0.3s, box-shadow 0.3s;
+    padding: 16px 32px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow);
+    min-width: 200px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px !important;
+}
+
+.save-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.save-btn:hover::before {
+    left: 100%;
+}
+
+.save-btn:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    box-shadow: 0 6px 18px rgba(76,110,165,0.13);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+}
+
+.empty-schedule {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+/* Улучшения интерфейса: */
+.calendar-wrapper {
+    background: linear-gradient(135deg, #f8fafc 80%, #e2e8f0 100%);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 8px 32px rgba(76,110,165,0.10);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.days {
+    background: transparent;
+}
+
+.day {
+    background: linear-gradient(135deg, #fff 80%, #f7fafc 100%);
+    color: var(--dark-color);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    transition: background 0.4s cubic-bezier(.4,0,.2,1), color 0.4s, box-shadow 0.4s, border 0.4s;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease;
+    border-radius: 18px !important;
+    box-shadow: 0 2px 8px rgba(76,110,165,0.06);
+}
+
+.day:hover {
+    background: linear-gradient(135deg, #f7fafc 90%, #e2e8f0 100%);
+    box-shadow: 0 6px 24px 0 rgba(76,110,165,0.13);
+}
+
+.day.other-month {
+    background: linear-gradient(135deg, #f7fafc 80%, #e2e8f0 100%);
+    color: #bfc8e6;
+    opacity: 0.7;
+}
+
+.day.absence-marked {
+    background: linear-gradient(135deg, #fff5f5 80%, #ffe6e6 100%);
+    border: 2px solid #ff8e8e;
+}
+
+.day-absence-count {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* Модальное окно */
+.schedule-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+.schedule-modal[style*="display: flex"] {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.4s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-modal);
+    position: relative;
+    z-index: 1001;
+    animation: modalSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 22px !important;
+    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.18);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+.modal-title {
+    flex: 1;
+}
+
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.date-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: 16px;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+}
+
+.day-schedule {
+    margin-bottom: 24px;
+}
+
+.schedule-item {
+    background: #fff;
+    color: var(--dark-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    padding: 18px;
+    transition: box-shadow 0.2s, background 0.2s;
+    position: relative;
+}
+
+.schedule-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%);
+}
+
+.schedule-item:hover::before {
+    animation: shimmer 1.5s;
+}
+
+.schedule-item:hover {
+    background: linear-gradient(135deg, #f7fafc 90%, #e2e8f0 100%);
+    box-shadow: 0 8px 24px 0 rgba(76,110,165,0.13);
+}
+
+.schedule-item.absent {
+    background: #fff5f5;
+    border-left-color: var(--accent-color);
+}
+
+.schedule-time {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.schedule-time::before {
+    content: '🕒';
+    font-size: 0.9em;
+}
+
+.schedule-item.absent .schedule-time {
+    color: #ff6b6b;
+}
+
+.schedule-subject {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+    color: var(--dark-color);
+    line-height: 1.4;
+}
+
+.schedule-details {
+    display: flex;
+    justify-content: space-between;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.schedule-details span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.schedule-details span::before {
+    font-size: 0.9em;
+}
+
+.schedule-details span:first-child::before {
+    content: '🏢';
+}
+
+.schedule-details span:last-child::before {
+    content: '👤';
+}
+
+.attendance-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 8px;
+}
+
+.attendance-toggle input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.attendance-toggle input:checked {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.attendance-toggle label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    flex: 1;
+}
+
+.attendance-toggle input:checked + label {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.attendance-summary {
+    background: linear-gradient(135deg, #f8fafc 80%, #e2e8f0 100%);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.07);
+    padding: 20px;
+    border-radius: var(--border-radius-sm);
+    animation: fadeIn 0.6s ease;
+    border: 1px solid var(--gray-200);
+    border-radius: 18px !important;
+}
+
+.attendance-summary h4 {
+    margin-bottom: 16px;
+    color: var(--dark-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-total {
+    font-weight: 800;
+    border-top: 2px solid var(--gray-300);
+    padding-top: 12px;
+    margin-top: 12px;
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+/* Фон-подложка под кнопкой сохранить */
+.modal-footer {
+    padding: 0;
+    border-top: none;
+    text-align: center;
+    position: static;
+    background: #f8fafc;
+    box-shadow: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    margin-top: 24px;
+}
+
+.save-btn {
+    margin: 0 auto;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 12px 0 rgba(76,110,165,0.10);
+    border-radius: 18px !important;
+    transition: background 0.3s, box-shadow 0.3s;
+    padding: 16px 32px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow);
+    min-width: 200px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px !important;
+}
+
+.save-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.save-btn:hover::before {
+    left: 100%;
+}
+
+.save-btn:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    box-shadow: 0 6px 18px rgba(76,110,165,0.13);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+}
+
+.empty-schedule {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+/* --- Мобильная оптимизация модального окна и кнопки --- */
+@media (max-width: 600px) {
+    .modal-content {
+        max-width: 100vw;
+        width: 100vw;
+        border-radius: 0 !important;
+        min-height: 100vh;
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
-    
-    // Показать версию
-    function showVersion() {
-        versionInfo.classList.add('show');
-        
-        setTimeout(() => {
-            versionInfo.classList.remove('show');
-        }, 3000);
+    .modal-header,
+    .modal-body {
+        padding: 12px 8px;
     }
-    
-    // Обработчики событий
-    prevMonthButton.addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-        generateCalendar();
-        
-        // Вибрация при переключении
-        if ('vibrate' in navigator) {
-            navigator.vibrate(30);
-        }
-    });
-    
-    nextMonthButton.addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        generateCalendar();
-        
-        // Вибрация при переключении
-        if ('vibrate' in navigator) {
-            navigator.vibrate(30);
-        }
-    });
-    
-    closeModalButton.addEventListener('click', closeModal);
-    modalBackdrop.addEventListener('click', closeModal);
-    
-    saveAttendanceButton.addEventListener('click', saveAttendance);
-    
-    // Обновление статистики при изменении checkbox
-    document.addEventListener('change', (event) => {
-        if (event.target.matches('.attendance-toggle input')) {
-            const checkboxes = document.querySelectorAll('.attendance-toggle input');
-            const absencesCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-            
-            if (selectedDayOfWeek && scheduleData[selectedDayOfWeek]) {
-                updateAttendanceSummary(absencesCount, scheduleData[selectedDayOfWeek].length);
-            }
-            
-            // Легкая вибрация при изменении
-            if ('vibrate' in navigator) {
-                navigator.vibrate(20);
-            }
-        }
-    });
-    
-    // Обработчик прокрутки для показа версии
-    let lastScrollTop = 0;
-    let versionShown = false;
-    
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Показываем версию только при прокрутке вниз и если еще не показывали
-        if (scrollTop > lastScrollTop && scrollTop > 100 && !versionShown) {
-            showVersion();
-            versionShown = true;
-        }
-        
-        // Показываем версию при достижении конца страницы
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
-        
-        if (scrollHeight - scrollTop - clientHeight < 50 && !versionShown) {
-            showVersion();
-            versionShown = true;
-        }
-        
-        lastScrollTop = scrollTop;
-    });
-    
-    // Скрываем версию при касании
-    versionInfo.addEventListener('click', function() {
-        versionInfo.classList.remove('show');
-    });
-    
-    // Swipe для мобильных
-    let touchStartX = 0;
-    let touchStartY = 0;
-    
-    calendarDays.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-        
-        // Скрываем подсказку о свайпе после первого использования
-        localStorage.setItem('swipeHintSeen', 'true');
-        mobileIndicator.classList.add('hidden');
-    });
-    
-    calendarDays.addEventListener('touchend', (e) => {
-        const touchEndX = e.changedTouches[0].screenX;
-        const touchEndY = e.changedTouches[0].screenY;
-        const diffX = touchEndX - touchStartX;
-        const diffY = touchEndY - touchStartY;
-        
-        // Проверяем, что это горизонтальный свайп, а не вертикальный
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-            if (diffX > 0) {
-                // Swipe right - previous month
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-            } else {
-                // Swipe left - next month
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-            }
-            generateCalendar();
-            
-            // Вибрация при свайпе
-            if ('vibrate' in navigator) {
-                navigator.vibrate(50);
-            }
-        }
-    });
-    
-    // Инициализация
-    generateCalendar();
-    
-    // Показываем версию при загрузке (только на мобильных)
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        setTimeout(showVersion, 2000);
+    .modal-body {
+        max-height: none;
+        flex: 1 1 auto;
+        overflow-y: auto;
     }
-});
+    .modal-footer {
+        margin-top: 0;
+        padding: 0;
+        height: auto;
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #f8fafc;
+        z-index: 10;
+        box-shadow: 0 -2px 12px 0 rgba(76,110,165,0.07);
+    }
+    .save-btn {
+        padding: 14px 10px;
+        font-size: 1rem;
+        min-width: 90vw;
+        max-width: 98vw;
+        margin: 10px auto 10px auto;
+        border-radius: 14px !important;
+        box-sizing: border-box;
+    }
+    .attendance-summary {
+        padding: 10px 6px;
+    }
+    .schedule-item {
+        padding: 10px 6px;
+        font-size: 0.97rem;
+    }
+    .modal-header h3 {
+        font-size: 1.05rem;
+    }
+    .date-badge {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+    }
+}

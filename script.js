@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeModalButton = document.getElementById('close-modal');
     const versionInfo = document.getElementById('version-info');
     const mobileIndicator = document.querySelector('.mobile-indicator');
+    const versionCorner = document.getElementById('version-corner');
     
     // Расписание занятий
     const scheduleData = {
@@ -175,16 +176,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function openSchedule(day, dayOfWeek) {
         selectedDate = `${currentYear}-${currentMonth + 1}-${day}`;
         selectedDayOfWeek = dayOfWeek;
-        
+
         const date = new Date(currentYear, currentMonth, day);
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
         modalDate.textContent = `Розклад на ${date.toLocaleDateString('uk-UA', options)}`;
         dateBadge.textContent = weekdays[date.getDay()];
-        
+
         renderSchedule();
         scheduleModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
+
+        // Скрыть версию в углу при открытии модального окна
+        if (versionCorner) versionCorner.classList.add('hide');
+
         // Вибрация при открытии (на мобильных)
         if ('vibrate' in navigator) {
             navigator.vibrate(50);
@@ -280,6 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         scheduleModal.style.display = 'none';
         document.body.style.overflow = 'auto';
+
+        // Показать версию в углу при закрытии модального окна
+        if (versionCorner) versionCorner.classList.remove('hide');
     }
     
     // Показать версию

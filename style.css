@@ -1691,7 +1691,7 @@ main {
 .modal-content {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px rgba(255, 254, 254, 0.25);
 }
 
 .modal-header {
@@ -1729,7 +1729,7 @@ main {
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgb(0, 0, 0);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -1786,140 +1786,87 @@ main {
 }
 
 .schedule-details span {
-    background: rgba(74, 111, 165, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     padding: 4px 8px;
     border-radius: 8px;
     font-weight: 500;
 }
 
-/* Улучшенные стили для переключателей посещаемости */
-.attendance-toggle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    transition: all 0.3s ease;
+/* Duty-list: чекбоксы "Сьогодні чергував" крупнее, анимация, текст жирный */
+.duty-list-table .duty-today {
+    width: 32px;
+    height: 32px;
+    accent-color: var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.15s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 1px 6px rgba(109, 109, 109, 0.61);
+    margin: 0 auto;
+    display: block;
 }
-
-.attendance-toggle:hover {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-    border-color: var(--primary-color);
+.duty-list-table .duty-today:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 4px rgba(76,110,165,0.13);
 }
-
-.attendance-toggle input {
-    width: 24px;
-    height: 24px;
+.duty-list-table .duty-today:checked {
     accent-color: var(--accent-color);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    border-radius: 6px;
+    box-shadow: 0 0 0 4px rgba(255,107,107,0.18);
+    animation: dutyCheckBounce 0.25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes dutyCheckBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+    100% { transform: scale(1); }
 }
 
-.attendance-toggle input:checked {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
-}
-
-.attendance-toggle label {
-    font-size: 1rem;
-    color: var(--gray-700);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    flex: 1;
-    line-height: 1.4;
-}
-
-/* Список чергования */
-.duty-list-section {
-    margin: 32px 0 0 0;
-    padding: 0 0 24px 0;
-    background: none;
-}
-
-.duty-list-title {
-    font-size: 1.15rem;
+/* Имя и фамилия — жирным и чёрным */
+.duty-list-table td:nth-child(2) {
     font-weight: 700;
-    margin: 18px 0 10px 0;
-    color: var(--primary-dark);
-    letter-spacing: 0.5px;
-    text-align: left;
+    color: #ffffff;
+    font-size: 1.10em;
+    letter-spacing: 0.2px;
 }
 
-.duty-list-wrapper {
-    overflow-x: auto;
-    background: rgba(255,255,255,0.65);
-    border-radius: 16px;
-    box-shadow: 0 2px 16px 0 rgba(31,38,135,0.07);
-    padding: 0;
-    margin: 0;
-}
-
-.duty-list-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.98rem;
-    background: transparent;
-}
-
-.duty-list-table th,
-.duty-list-table td {
-    padding: 6px 8px;
-    border-bottom: 1px solid #e2e8f0;
-    text-align: left;
-    white-space: nowrap;
-}
-
-.duty-list-table th {
-    background: rgba(74,111,165,0.10);
+/* Количество чергувань — крупнее */
+.duty-list-table .duty-count {
+    font-size: 1.40em;
+    font-weight: 600;
     color: var(--primary-color);
-    font-weight: 700;
-    font-size: 0.97rem;
-    border-top: none;
+    text-align: center;
 }
 
-.duty-list-table tr:last-child td {
-    border-bottom: none;
-}
-
-.duty-list-table tr:nth-child(even) td {
-    background: rgba(74,111,165,0.03);
-}
-
-.duty-list-table tr:hover td {
-    background: rgba(74,111,165,0.09);
-    transition: background 0.2s;
-}
-
-/* Минимализм и стекло для duty-list */
-.duty-list-wrapper {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.13);
-}
-
-/* Мобильная адаптация */
+/* Оптимизация для мобильных */
 @media (max-width: 600px) {
-    .duty-list-section {
-        margin: 18px 0 0 0;
-        padding: 0 0 12px 0;
-    }
-    .duty-list-title {
-        font-size: 1rem;
-        margin: 10px 0 6px 0;
-        text-align: center;
-    }
-    .duty-list-wrapper {
-        border-radius: 10px;
-        margin: 0 -4px;
-    }
     .duty-list-table th,
     .duty-list-table td {
-        padding: 4px 6px;
-        font-size: 0.85rem;
+        padding: 7px 4px;
+        font-size: 1.01rem;
+    }
+    .duty-list-table .duty-today {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+    .duty-list-table td:nth-child(2) {
+        font-size: 1.13em;
+    }
+    .duty-list-table .duty-count {
+        font-size: 1.18em;
+    }
+}
+
+/* Анимация появления строк duty-list */
+.duty-list-table tr {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+    animation: dutyRowFadeIn 0.35s cubic-bezier(.4,0,.2,1) forwards;
+}
+.duty-list-table tr:nth-child(n) {
+    animation-delay: calc(0.04s * var(--i, 1));
+}
+@keyframes dutyRowFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }

@@ -470,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td class="duty-count" data-fio="${fio}">${count}</td>
                 <td>
                     <input type="checkbox" class="duty-today" data-fio="${fio}" />
+                    <button type="button" class="duty-minus" data-fio="${fio}" aria-label="Зменшити на 1">−</button>
                 </td>
             `;
             // Для анимации появления строк
@@ -490,6 +491,24 @@ document.addEventListener('DOMContentLoaded', function() {
             if (td) td.textContent = dutyCounts[fio];
             // Снимаем галочку через 400мс для UX
             setTimeout(() => { e.target.checked = false; }, 400);
+        }
+    });
+
+    // Кнопка уменьшения счётчика на 1
+    dutyTable.addEventListener('click', function(e) {
+        if (e.target.classList.contains('duty-minus')) {
+            const fio = e.target.dataset.fio;
+            const current = dutyCounts[fio] || 0;
+            if (current > 0) {
+                dutyCounts[fio] = current - 1;
+                localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
+                const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
+                if (td) td.textContent = dutyCounts[fio];
+            }
+            // Анимация клика
+            const btn = e.target;
+            btn.style.transform = 'scale(0.92)';
+            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 120);
         }
     });
 

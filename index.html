@@ -10,6 +10,7 @@
     <meta name="theme-color" content="#4a6fa5">
     <meta name="msapplication-navbutton-color" content="#4a6fa5">
     <meta name="msapplication-TileColor" content="#4a6fa5">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
     <title>Розклад занять БН-3-2</title>
     <link rel="stylesheet" href="style.css">
     
@@ -142,7 +143,7 @@
 
     <!-- Перемещённый и обновлённый блок версии в правый нижний угол -->
     <div class="version-corner" id="version-corner">
-        <span>v2.4.1</span>
+        <span>v2.3.9</span>
     </div>
 
     <script src="script.js"></script>
@@ -163,27 +164,3 @@
     </script>
 </body>
 </html>
-    <div class="version-corner" id="version-corner">
-        <span>v2.4.1</span>
-    </div>
-
-    <script src="script.js"></script>
-    <script>
-    // Вкладки: переключение
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabBtns.forEach((btn, idx) => {
-            btn.addEventListener('click', function() {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                tabContents[idx].classList.add('active');
-            });
-        });
-    });
-    </script>
-</body>
-</html>
-
-

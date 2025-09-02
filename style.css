@@ -866,6 +866,10 @@ main {
         margin: 0 -4px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        background: rgba(30,34,44,0.92);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 2px 16px 0 rgba(31,38,135,0.13);
+        padding: 6px 4px;
     }
     .duty-list-table th,
     .duty-list-table td {
@@ -1807,6 +1811,26 @@ main {
     margin: 0 auto;
     display: block;
 }
+.duty-list-table .duty-minus {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    transition: box-shadow 0.2s, transform 0.15s cubic-bezier(.4,0,.2,1), background 0.2s;
+}
+.duty-list-table .duty-minus:hover {
+    background: rgba(255,255,255,0.15);
+}
+.duty-list-table .duty-minus:active {
+    transform: scale(0.92);
+}
 .duty-list-table .duty-today:active {
     transform: scale(0.92);
     box-shadow: 0 0 0 4px rgba(76,110,165,0.13);
@@ -1849,6 +1873,12 @@ main {
         width: 38px;
         height: 38px;
         border-radius: 10px;
+    }
+    .duty-list-table .duty-minus {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        margin-left: 6px;
     }
     .duty-list-table td:nth-child(2) {
         font-size: 1.13em;

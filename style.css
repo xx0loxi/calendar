@@ -41,6 +41,74 @@ body {
     touch-action: manipulation;
 }
 
+/* --- Форсированная тёмная тема для всего сайта --- */
+.theme-dark body,
+.theme-dark {
+    background: #0f1623 !important;
+    color: #e2e8f0 !important;
+}
+.theme-dark header {
+    background: rgba(17, 24, 39, 0.95) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+.theme-dark .month-nav h2,
+.theme-dark #current-year { color: #e2e8f0 !important; }
+.theme-dark .calendar-wrapper {
+    background: #111827 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+}
+.theme-dark .weekdays { background: linear-gradient(135deg, #294469, #3c5c8a) !important; }
+.theme-dark .weekdays div { color: #f8fafc !important; }
+.theme-dark .days { background: transparent !important; }
+.theme-dark .day {
+    background: #1f2937 !important;
+    color: #e2e8f0 !important;
+    border-color: #374151 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+}
+.theme-dark .day:hover { background: #243041 !important; }
+.theme-dark .day.other-month { background: #111827 !important; color: #718096 !important; }
+.theme-dark .day-number { color: #f8fafc !important; }
+.theme-dark .day-subject { color: #cbd5e0 !important; background: rgba(180, 198, 230, 0.12) !important; }
+.theme-dark .day.absence-marked { border-color: var(--accent-color) !important; }
+.theme-dark .schedule-modal .modal-content {
+    background: #111827 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+.theme-dark .modal-header { background: linear-gradient(135deg, #294469, #3c5c8a) !important; }
+.theme-dark .date-badge { background: rgba(255,255,255,0.15) !important; color: #fff !important; }
+.theme-dark .schedule-item { background: #1f2937 !important; border-color: #374151 !important; color: #e2e8f0 !important; }
+.theme-dark .schedule-time { color: #9ec1ff !important; }
+.theme-dark .schedule-subject { color: #f8fafc !important; }
+.theme-dark .schedule-details { color: #cbd5e0 !important; }
+.theme-dark .attendance-toggle { border-color: #374151 !important; }
+.theme-dark .attendance-summary { background: #111827 !important; border-color: #374151 !important; }
+.theme-dark .save-btn { box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important; }
+.theme-dark .version-corner { background: rgba(17, 24, 39, 0.92) !important; color: #fff !important; }
+.theme-dark .duty-list-wrapper {
+    background: rgba(17, 24, 39, 0.92) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+}
+.theme-dark .duty-list-table th { background: rgba(59, 89, 134, 0.25) !important; color: #fff !important; }
+.theme-dark .duty-list-table td { color: #e2e8f0 !important; background: rgba(255,255,255,0.02); }
+.theme-dark .duty-list-table tr:nth-child(even) td { background: rgba(59, 89, 134, 0.10) !important; }
+.theme-dark .duty-list-table tr:hover td { background: rgba(59, 89, 134, 0.18) !important; }
+
+/* Починка duty-list отображения на iPhone: фиксируем ширины и контраст */
+.theme-dark .duty-list-table { width: 100% !important; border-collapse: collapse !important; }
+.theme-dark .duty-list-table th, .theme-dark .duty-list-table td { background-clip: padding-box; }
+
+/* Сделать мобильный интерфейс максимально похожим на десктоп: принудительные размеры */
+.desktop-on-mobile .modal-content { max-width: 500px !important; width: 100% !important; max-height: 85vh !important; position: static !important; border-radius: 22px !important; margin: 0 auto !important; }
+.desktop-on-mobile .modal-body { max-height: 60vh !important; padding-bottom: 0 !important; }
+.desktop-on-mobile .modal-footer { position: static !important; box-shadow: none !important; }
+.desktop-on-mobile .day { min-height: 70px !important; padding: 12px !important; }
+.desktop-on-mobile .days { gap: 8px !important; }
+.desktop-on-mobile .nav-btn { width: 44px !important; height: 44px !important; }
+.desktop-on-mobile .save-btn { width: auto !important; max-width: 260px !important; }
+
+
 .container {
     max-width: 100%;
     margin: 0 auto;

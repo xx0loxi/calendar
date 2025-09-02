@@ -38,6 +38,7 @@ body {
     padding: 0;
     margin: 0;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .container {
@@ -863,6 +864,8 @@ main {
     .duty-list-wrapper {
         border-radius: 10px;
         margin: 0 -4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .duty-list-table th,
     .duty-list-table td {
@@ -1868,5 +1871,25 @@ main {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+/* Предпочтение уменьшенного движения */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Смягчённые тени для мобильных ради производительности */
+@media (max-width: 600px) {
+    .day,
+    .schedule-item,
+    header,
+    .calendar-wrapper,
+    .save-btn {
+        box-shadow: 0 1px 6px rgba(0,0,0,0.08) !important;
     }
 }

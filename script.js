@@ -426,6 +426,73 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
+    // Duty-list: только имя и фамилия, количество чергувань, чекбокс "Сьогодні чергував"
+    const dutyList = [
+        "Ахіджанов Микола",
+        "Бублик Анатолій",
+        "Васін Максим",
+        "Волоцький Дмитро",
+        "Галенко Максим",
+        "Джуманов Дамір",
+        "Дрозд Євгеній",
+        "Дяченко Ігор",
+        "Житченко Олександр",
+        "Жолонка Дмитро",
+        "Заголовацький Богдан",
+        "Карпенко Ігор",
+        "Корніліч Кирило",
+        "Лаврушко Максим",
+        "Мартин Владислав",
+        "Михайлов Владислав",
+        "Поліщук Денис",
+        "Решетніков Максим",
+        "Сердюк Станіслав",
+        "Слиньок Матвій",
+        "Терещенко Денис",
+        "Хоменко Олександр"
+    ];
+
+    const dutyTable = document.getElementById('duty-table').querySelector('tbody');
+    // Ключ для хранения количества чергувань
+    const dutyCountsKey = 'dutyCounts';
+    let dutyCounts = JSON.parse(localStorage.getItem(dutyCountsKey)) || {};
+
+    function renderDutyTable() {
+        dutyTable.innerHTML = '';
+        dutyList.forEach((fio, idx) => {
+            const count = dutyCounts[fio] || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td>${fio}</td>
+                <td class="duty-count" data-fio="${fio}">${count}</td>
+                <td>
+                    <input type="checkbox" class="duty-today" data-fio="${fio}" />
+                </td>
+            `;
+            // Для анимации появления строк
+            tr.style.setProperty('--i', idx + 1);
+            dutyTable.appendChild(tr);
+        });
+    }
+
+    // Обработка отметки "Сьогодні чергував"
+    dutyTable.addEventListener('change', function(e) {
+        if (e.target.classList.contains('duty-today')) {
+            const fio = e.target.dataset.fio;
+            // Увеличиваем количество
+            dutyCounts[fio] = (dutyCounts[fio] || 0) + 1;
+            localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
+            // Обновляем только ячейку количества
+            const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
+            if (td) td.textContent = dutyCounts[fio];
+            // Снимаем галочку через 400мс для UX
+            setTimeout(() => { e.target.checked = false; }, 400);
+        }
+    });
+
+    renderDutyTable();
+
     // Обработчики событий
     prevMonthButton.addEventListener('click', () => {
         currentMonth--;

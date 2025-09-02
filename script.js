@@ -21,8 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const versionInfo = document.getElementById('version-info');
     const mobileIndicator = document.querySelector('.mobile-indicator');
     const versionCorner = document.getElementById('version-corner');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
     
     // Расписание занятий
     const scheduleData = {
@@ -90,51 +88,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Генерация календаря
     function generateCalendar() {
-        // Используем DocumentFragment для снижения reflow/repaint
-        const fragment = document.createDocumentFragment();
         calendarDays.innerHTML = '';
-
+        
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
         const firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
         const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-
+        
         const months = [
             "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
             "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
         ];
-
+        
         // Обновляем и месяц и год
         currentMonthElement.textContent = months[currentMonth];
         currentYearElement.textContent = currentYear;
-
+        
         // Подсчет и отображение пропусков за месяц
         const absences = getMonthlyAbsences(currentYear, currentMonth);
         updateMonthAbsenceIndicator(absences);
-
+        
         // Дни предыдущего месяца
         for (let i = firstDayIndex; i > 0; i--) {
-            fragment.appendChild(createDay(prevLastDay - i + 1, true));
+            createDay(prevLastDay - i + 1, true);
         }
-
+        
         // Дни текущего месяца
         for (let i = 1; i <= lastDay.getDate(); i++) {
-            fragment.appendChild(createDay(i, false));
+            createDay(i, false);
         }
-
+        
         // Дни следующего месяца
         const daysLeft = 42 - (firstDayIndex + lastDay.getDate());
         for (let i = 1; i <= daysLeft; i++) {
-            fragment.appendChild(createDay(i, true));
+            createDay(i, true);
         }
-
-        calendarDays.appendChild(fragment);
-
+        
         // Скрываем подсказку о свайпе после первого использования
         if (localStorage.getItem('swipeHintSeen')) {
             mobileIndicator.classList.add('hidden');
         }
-
+        
         // Анимация появления календаря
         animateCalendarAppearance();
     }
@@ -227,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         dayElement.innerHTML = dayContent;
-        return dayElement;
+        calendarDays.appendChild(dayElement);
     }
     
     // Открыть расписание
@@ -253,9 +247,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.style.overflow = 'hidden';
 
-        // Скрыть версию при открытии модального окна
+        // Скрыть версию только на мобильных
         if (versionCorner) {
-            versionCorner.classList.add('hide');
+            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                versionCorner.classList.add('hide');
+            }
         }
 
         // Вибрация при открытии (на мобильных)
@@ -413,9 +409,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = 'auto';
         }, 300);
 
-        // Показать версию при закрытии модального окна
+        // Показать версию только на мобильных
         if (versionCorner) {
-            versionCorner.classList.remove('hide');
+            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                versionCorner.classList.remove('hide');
+            }
         }
     }
     
@@ -428,100 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // Duty-list: только имя и фамилия, количество чергувань, чекбокс "Сьогодні чергував"
-    const dutyList = [
-        "Ахіджанов Микола",
-        "Бублик Анатолій",
-        "Васін Максим",
-        "Волоцький Дмитро",
-        "Галенко Максим",
-        "Джуманов Дамір",
-        "Дрозд Євгеній",
-        "Дяченко Ігор",
-        "Житченко Олександр",
-        "Жолонка Дмитро",
-        "Заголовацький Богдан",
-        "Карпенко Ігор",
-        "Корніліч Кирило",
-        "Лаврушко Максим",
-        "Мартин Владислав",
-        "Михайлов Владислав",
-        "Поліщук Денис",
-        "Решетніков Максим",
-        "Сердюк Станіслав",
-        "Слиньок Матвій",
-        "Терещенко Денис",
-        "Хоменко Олександр"
-    ];
-
-    // Получаем элементы для duty-list
-    const dutyTable = document.getElementById('duty-table');
-    const dutyTableBody = dutyTable ? dutyTable.querySelector('tbody') : null;
-    
-    // Ключ для хранения количества чергувань
-    const dutyCountsKey = 'dutyCounts';
-    let dutyCounts = JSON.parse(localStorage.getItem(dutyCountsKey)) || {};
-
-    function renderDutyTable() {
-        if (!dutyTableBody) {
-            console.error('Duty table body not found');
-            return;
-        }
-        
-        dutyTableBody.innerHTML = '';
-        dutyList.forEach((fio, idx) => {
-            const count = dutyCounts[fio] || 0;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${idx + 1}</td>
-                <td>${fio}</td>
-                <td class="duty-count" data-fio="${fio}">${count}</td>
-                <td>
-                    <input type="checkbox" class="duty-today" data-fio="${fio}" />
-                    <button type="button" class="duty-minus" data-fio="${fio}" aria-label="Зменшити на 1">−</button>
-                </td>
-            `;
-            // Для анимации появления строк
-            tr.style.setProperty('--i', idx + 1);
-            dutyTableBody.appendChild(tr);
-        });
-    }
-
-    // Обработка отметки "Сьогодні чергував"
-    if (dutyTable) {
-        dutyTable.addEventListener('change', function(e) {
-            if (e.target.classList.contains('duty-today')) {
-                const fio = e.target.dataset.fio;
-                // Увеличиваем количество
-                dutyCounts[fio] = (dutyCounts[fio] || 0) + 1;
-                localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
-                // Обновляем только ячейку количества
-                const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
-                if (td) td.textContent = dutyCounts[fio];
-                // Снимаем галочку через 400мс для UX
-                setTimeout(() => { e.target.checked = false; }, 400);
-            }
-        });
-
-        // Кнопка уменьшения счётчика на 1
-        dutyTable.addEventListener('click', function(e) {
-            if (e.target.classList.contains('duty-minus')) {
-                const fio = e.target.dataset.fio;
-                const current = dutyCounts[fio] || 0;
-                if (current > 0) {
-                    dutyCounts[fio] = current - 1;
-                    localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
-                    const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
-                    if (td) td.textContent = dutyCounts[fio];
-                }
-                // Анимация клика
-                const btn = e.target;
-                btn.style.transform = 'scale(0.92)';
-                setTimeout(() => { btn.style.transform = 'scale(1)'; }, 120);
-            }
-        });
-    }
-
     // Обработчики событий
     prevMonthButton.addEventListener('click', () => {
         currentMonth--;
@@ -623,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         lastScrollTop = scrollTop;
-    }, { passive: true });
+    });
     
     // Скрываем версию при касании
     versionInfo.addEventListener('click', function() {
@@ -641,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Скрываем подсказку о свайпе после первого использования
         localStorage.setItem('swipeHintSeen', 'true');
         mobileIndicator.classList.add('hidden');
-    }, { passive: true });
+    });
     
     calendarDays.addEventListener('touchend', (e) => {
         const touchEndX = e.changedTouches[0].screenX;
@@ -683,66 +587,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 navigator.vibrate(50);
             }
         }
-    }, { passive: true });
+    });
     
-    // Темизация: определяем тему (localStorage -> системная), даём переключатель
-    const themeStorageKey = 'siteTheme';
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    function applyTheme(theme) {
-        document.documentElement.classList.remove('theme-dark');
-        document.documentElement.classList.remove('theme-light');
-        if (theme === 'dark') document.documentElement.classList.add('theme-dark');
-        if (theme === 'light') document.documentElement.classList.add('theme-light');
-    }
-    const storedTheme = localStorage.getItem(themeStorageKey);
-    applyTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.contains('theme-dark');
-            const next = isDark ? 'light' : 'dark';
-            applyTheme(next);
-            localStorage.setItem(themeStorageKey, next);
-            if ('vibrate' in navigator) navigator.vibrate(20);
-        }, { passive: true });
-    }
-
-    // Реакция на изменение системной темы, если пользователь не задал вручную
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    try {
-        media.addEventListener('change', (e) => {
-            const stored = localStorage.getItem(themeStorageKey);
-            if (!stored) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-    } catch (_) {
-        // Safari/iOS старые версии
-        media.onchange = (e) => {
-            const stored = localStorage.getItem(themeStorageKey);
-            if (!stored) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
-        };
-    }
-    // Делаем мобильный UI визуально как десктопный по-прежнему
-    if (window.innerWidth <= 600) {
-        document.documentElement.classList.add('desktop-on-mobile');
-    }
-
     // Инициализация
     generateCalendar();
     
-    // Инициализация таблицы чергувания
-    if (dutyTableBody) {
-        renderDutyTable();
-        console.log('Duty table initialized successfully');
-    } else {
-        console.error('Duty table body not found during initialization');
-    }
-    
     // Показываем версию при загрузке (только на мобильных)
-    setTimeout(showVersion, 2000);
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        setTimeout(showVersion, 2000);
+    }
     
     // Добавляем поддержку клавиатуры для мобильных
     document.addEventListener('keydown', (e) => {
@@ -776,37 +629,6 @@ document.addEventListener('DOMContentLoaded', function() {
             scrollTimeout = setTimeout(() => {
                 isScrolling = false;
             }, 150);
-        }, { passive: true });
+        });
     }
-
-    // Переключение вкладок + управление видимостью версии на вкладке чергування
-    tabBtns.forEach((btn, idx) => {
-        btn.addEventListener('click', function() {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            tabContents[idx].classList.add('active');
-
-            // Лёгкая анимация появления контента вкладки
-            const content = tabContents[idx];
-            content.style.opacity = '0';
-            content.style.transform = 'translateY(8px)';
-            requestAnimationFrame(() => {
-                content.style.transition = 'opacity 250ms ease, transform 250ms ease';
-                content.style.opacity = '1';
-                content.style.transform = 'translateY(0)';
-            });
-
-            // Прятать версию на вкладке "Чергування" и показывать на календаре
-            if (btn.id === 'tab-duty-btn') {
-                if (versionCorner) versionCorner.classList.add('hide');
-                // Перерисовываем таблицу чергувания при переключении на вкладку
-                setTimeout(() => {
-                    renderDutyTable();
-                }, 100);
-            } else {
-                if (versionCorner) versionCorner.classList.remove('hide');
-            }
-        }, { passive: true });
-    });
 });

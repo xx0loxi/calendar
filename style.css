@@ -108,6 +108,58 @@ body {
 .desktop-on-mobile .nav-btn { width: 44px !important; height: 44px !important; }
 .desktop-on-mobile .save-btn { width: auto !important; max-width: 260px !important; }
 
+/* --- Явная светлая тема: белые фоны, тёмный текст --- */
+.theme-light body,
+.theme-light {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+.theme-light header {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-color: #e5e7eb !important;
+}
+.theme-light .month-nav h2,
+.theme-light #current-year { color: #111827 !important; }
+.theme-light .calendar-wrapper {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06) !important;
+}
+.theme-light .weekdays { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important; }
+.theme-light .weekdays div { color: #ffffff !important; }
+.theme-light .days { background: #f3f4f6 !important; }
+.theme-light .day {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+.theme-light .day:hover { background: #f9fafb !important; }
+.theme-light .day.other-month { background: #f9fafb !important; color: #9ca3af !important; }
+.theme-light .day-number { color: #111827 !important; }
+.theme-light .day-subject { color: #374151 !important; background: rgba(74, 111, 165, 0.08) !important; }
+.theme-light .day.absence-marked { border-color: var(--accent-color) !important; }
+.theme-light .schedule-modal .modal-content {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+}
+.theme-light .modal-header { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important; }
+.theme-light .date-badge { background: rgba(17, 24, 39, 0.06) !important; color: #111827 !important; }
+.theme-light .schedule-item { background: #ffffff !important; border-color: #e5e7eb !important; color: #111827 !important; }
+.theme-light .schedule-time { color: var(--primary-color) !important; }
+.theme-light .schedule-subject { color: #111827 !important; }
+.theme-light .schedule-details { color: #374151 !important; }
+.theme-light .attendance-toggle { border-color: #e5e7eb !important; }
+.theme-light .attendance-summary { background: #ffffff !important; border-color: #e5e7eb !important; }
+.theme-light .version-corner { background: rgba(44, 62, 80, 0.92) !important; color: #fff !important; }
+.theme-light .duty-list-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+.theme-light .duty-list-table th { background: rgba(74,111,165,0.08) !important; color: #111827 !important; }
+.theme-light .duty-list-table td { color: #111827 !important; background: rgba(0,0,0,0.0) !important; }
+.theme-light .duty-list-table tr:nth-child(even) td { background: rgba(17,24,39,0.03) !important; }
+.theme-light .duty-list-table tr:hover td { background: rgba(74,111,165,0.08) !important; }
 
 .container {
     max-width: 100%;
@@ -182,6 +234,40 @@ h1 {
     position: relative;
     overflow: hidden;
 }
+
+/* Иконка темы: активное состояние для тёмной темы */
+.theme-dark #theme-toggle {
+    background: linear-gradient(135deg, #1f2937, #111827);
+}
+
+/* Плавающая кнопка темы справа сверху */
+.theme-toggle-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1200;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: #fff;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+.theme-toggle-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-hover); }
+.theme-dark .theme-toggle-btn { background: linear-gradient(135deg, #1f2937, #111827); }
+
+/* Фон-подложка под кнопкой сохранить — меняется по теме */
+.modal-footer {
+    background: #f8fafc;
+}
+.theme-dark .modal-footer { background: #1a202c !important; }
+.theme-light .modal-footer { background: #f8fafc !important; }
 
 .nav-btn::before {
     content: '';

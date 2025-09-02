@@ -454,13 +454,21 @@ document.addEventListener('DOMContentLoaded', function() {
         "Хоменко Олександр"
     ];
 
-    const dutyTable = document.getElementById('duty-table').querySelector('tbody');
+    // Получаем элементы для duty-list
+    const dutyTable = document.getElementById('duty-table');
+    const dutyTableBody = dutyTable ? dutyTable.querySelector('tbody') : null;
+    
     // Ключ для хранения количества чергувань
     const dutyCountsKey = 'dutyCounts';
     let dutyCounts = JSON.parse(localStorage.getItem(dutyCountsKey)) || {};
 
     function renderDutyTable() {
-        dutyTable.innerHTML = '';
+        if (!dutyTableBody) {
+            console.error('Duty table body not found');
+            return;
+        }
+        
+        dutyTableBody.innerHTML = '';
         dutyList.forEach((fio, idx) => {
             const count = dutyCounts[fio] || 0;
             const tr = document.createElement('tr');
@@ -475,44 +483,44 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             // Для анимации появления строк
             tr.style.setProperty('--i', idx + 1);
-            dutyTable.appendChild(tr);
+            dutyTableBody.appendChild(tr);
         });
     }
 
     // Обработка отметки "Сьогодні чергував"
-    dutyTable.addEventListener('change', function(e) {
-        if (e.target.classList.contains('duty-today')) {
-            const fio = e.target.dataset.fio;
-            // Увеличиваем количество
-            dutyCounts[fio] = (dutyCounts[fio] || 0) + 1;
-            localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
-            // Обновляем только ячейку количества
-            const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
-            if (td) td.textContent = dutyCounts[fio];
-            // Снимаем галочку через 400мс для UX
-            setTimeout(() => { e.target.checked = false; }, 400);
-        }
-    });
-
-    // Кнопка уменьшения счётчика на 1
-    dutyTable.addEventListener('click', function(e) {
-        if (e.target.classList.contains('duty-minus')) {
-            const fio = e.target.dataset.fio;
-            const current = dutyCounts[fio] || 0;
-            if (current > 0) {
-                dutyCounts[fio] = current - 1;
+    if (dutyTable) {
+        dutyTable.addEventListener('change', function(e) {
+            if (e.target.classList.contains('duty-today')) {
+                const fio = e.target.dataset.fio;
+                // Увеличиваем количество
+                dutyCounts[fio] = (dutyCounts[fio] || 0) + 1;
                 localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
+                // Обновляем только ячейку количества
                 const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
                 if (td) td.textContent = dutyCounts[fio];
+                // Снимаем галочку через 400мс для UX
+                setTimeout(() => { e.target.checked = false; }, 400);
             }
-            // Анимация клика
-            const btn = e.target;
-            btn.style.transform = 'scale(0.92)';
-            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 120);
-        }
-    });
+        });
 
-    renderDutyTable();
+        // Кнопка уменьшения счётчика на 1
+        dutyTable.addEventListener('click', function(e) {
+            if (e.target.classList.contains('duty-minus')) {
+                const fio = e.target.dataset.fio;
+                const current = dutyCounts[fio] || 0;
+                if (current > 0) {
+                    dutyCounts[fio] = current - 1;
+                    localStorage.setItem(dutyCountsKey, JSON.stringify(dutyCounts));
+                    const td = dutyTable.querySelector(`.duty-count[data-fio="${fio}"]`);
+                    if (td) td.textContent = dutyCounts[fio];
+                }
+                // Анимация клика
+                const btn = e.target;
+                btn.style.transform = 'scale(0.92)';
+                setTimeout(() => { btn.style.transform = 'scale(1)'; }, 120);
+            }
+        });
+    }
 
     // Обработчики событий
     prevMonthButton.addEventListener('click', () => {
@@ -725,6 +733,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализация
     generateCalendar();
     
+    // Инициализация таблицы чергувания
+    if (dutyTableBody) {
+        renderDutyTable();
+        console.log('Duty table initialized successfully');
+    } else {
+        console.error('Duty table body not found during initialization');
+    }
+    
     // Показываем версию при загрузке (только на мобильных)
     setTimeout(showVersion, 2000);
     
@@ -784,6 +800,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Прятать версию на вкладке "Чергування" и показывать на календаре
             if (btn.id === 'tab-duty-btn') {
                 if (versionCorner) versionCorner.classList.add('hide');
+                // Перерисовываем таблицу чергувания при переключении на вкладку
+                setTimeout(() => {
+                    renderDutyTable();
+                }, 100);
             } else {
                 if (versionCorner) versionCorner.classList.remove('hide');
             }

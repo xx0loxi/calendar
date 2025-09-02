@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const versionInfo = document.getElementById('version-info');
     const mobileIndicator = document.querySelector('.mobile-indicator');
     const versionCorner = document.getElementById('version-corner');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
     
     // Расписание занятий
     const scheduleData = {
@@ -251,11 +253,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.style.overflow = 'hidden';
 
-        // Скрыть версию только на мобильных
+        // Скрыть версию при открытии модального окна
         if (versionCorner) {
-            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                versionCorner.classList.add('hide');
-            }
+            versionCorner.classList.add('hide');
         }
 
         // Вибрация при открытии (на мобильных)
@@ -413,11 +413,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = 'auto';
         }, 300);
 
-        // Показать версию только на мобильных
+        // Показать версию при закрытии модального окна
         if (versionCorner) {
-            if (window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                versionCorner.classList.remove('hide');
-            }
+            versionCorner.classList.remove('hide');
         }
     }
     
@@ -664,9 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generateCalendar();
     
     // Показываем версию при загрузке (только на мобильных)
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        setTimeout(showVersion, 2000);
-    }
+    setTimeout(showVersion, 2000);
     
     // Добавляем поддержку клавиатуры для мобильных
     document.addEventListener('keydown', (e) => {
@@ -702,4 +698,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 150);
         }, { passive: true });
     }
+
+    // Переключение вкладок + управление видимостью версии на вкладке чергування
+    tabBtns.forEach((btn, idx) => {
+        btn.addEventListener('click', function() {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            tabContents[idx].classList.add('active');
+
+            // Лёгкая анимация появления контента вкладки
+            const content = tabContents[idx];
+            content.style.opacity = '0';
+            content.style.transform = 'translateY(8px)';
+            requestAnimationFrame(() => {
+                content.style.transition = 'opacity 250ms ease, transform 250ms ease';
+                content.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            });
+
+            // Прятать версию на вкладке "Чергування" и показывать на календаре
+            if (btn.id === 'tab-duty-btn') {
+                if (versionCorner) versionCorner.classList.add('hide');
+            } else {
+                if (versionCorner) versionCorner.classList.remove('hide');
+            }
+        }, { passive: true });
+    });
 });

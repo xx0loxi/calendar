@@ -143,25 +143,10 @@
 
     <!-- Перемещённый и обновлённый блок версии в правый нижний угол -->
     <div class="version-corner" id="version-corner">
-        <span>v2.4.3</span>
+        <span>v2.4.3.6</span>
     </div>
 
     <script src="script.js"></script>
-    <script>
-    // Вкладки: переключение
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabBtns.forEach((btn, idx) => {
-            btn.addEventListener('click', function() {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                tabContents[idx].classList.add('active');
-            });
-        });
-    });
-    </script>
+    
 </body>
 </html>
-

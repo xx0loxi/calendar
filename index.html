@@ -8,11 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="Розклад БН-П-2">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#4a6fa5">
-    <meta name="color-scheme" content="dark light">
     <meta name="msapplication-navbutton-color" content="#4a6fa5">
     <meta name="msapplication-TileColor" content="#4a6fa5">
-    <meta name="format-detection" content="telephone=no, address=no, email=no">
-    <title>Розклад занять БН-3-2</title>
+    <title>Розклад занять БН-П-2</title>
     <link rel="stylesheet" href="style.css">
     
     <!-- Иконки для мобильных устройств -->
@@ -25,77 +23,47 @@
 </head>
 <body>
     <div class="container">
-        <!-- Вкладки -->
-        <nav class="tabs-nav">
-            <button class="tab-btn active" id="tab-calendar-btn" type="button">Календар</button>
-            <button class="tab-btn" id="tab-duty-btn" type="button">Чергування</button>
-        </nav>
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📚</div>
+                    <h1>БН-П-2</h1>
+                </div>
+                <div class="month-nav">
+                    <button id="prev-month" class="nav-btn" aria-label="Попередній місяць">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="month-year">
+                        <h2 id="current-month">Вересень</h2>
+                        <span id="current-year">2025</span>
+                    </div>
+                    <button id="next-month" class="nav-btn" aria-label="Наступний місяць">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-        <!-- Календарь -->
-        <div id="tab-calendar" class="tab-content active">
-            <header>
-                <div class="header-content">
-                    <div class="logo">
-                        <div class="logo-icon">📚</div>
-                        <h1>БН-3-2</h1>
-                    </div>
-                    <div class="month-nav">
-                        <button id="prev-month" class="nav-btn" aria-label="Попередній місяць">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                        <div class="month-year">
-                            <h2 id="current-month">Вересень</h2>
-                            <span id="current-year">2025</span>
-                        </div>
-                        <button id="next-month" class="nav-btn" aria-label="Наступний місяць">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </div>
+        <main>
+            <div class="calendar-wrapper">
+                <div class="weekdays">
+                    <div>Пн</div>
+                    <div>Вт</div>
+                    <div>Ср</div>
+                    <div>Чт</div>
+                    <div>Пт</div>
+                    <div>Сб</div>
+                    <div>Нд</div>
                 </div>
-            </header>
-            <main>
-                <div class="calendar-wrapper">
-                    <div class="weekdays">
-                        <div>Пн</div>
-                        <div>Вт</div>
-                        <div>Ср</div>
-                        <div>Чт</div>
-                        <div>Пт</div>
-                        <div>Сб</div>
-                        <div>Нд</div>
-                    </div>
-                    <div class="days" id="calendar-days">
-                        <!-- Дни будут добавлены через JavaScript -->
-                    </div>
+                <div class="days" id="calendar-days">
+                    <!-- Дни будут добавлены через JavaScript -->
                 </div>
-            </main>
-        </div>
-
-        <!-- Чергування -->
-        <div id="tab-duty" class="tab-content">
-            <section class="duty-list-section">
-                <h2 class="duty-list-title">Список чергування</h2>
-                <div class="duty-list-wrapper">
-                    <table class="duty-list-table" id="duty-table">
-                        <thead>
-                            <tr>
-                                <th>№</th>
-                                <th>Ім'я та прізвище</th>
-                                <th>Кількість чергувань</th>
-                                <th>Сьогодні чергував</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Данные будут добавлены через JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+            </div>
+        </main>
 
         <div class="schedule-modal" id="schedule-modal">
             <div class="modal-backdrop" id="modal-backdrop"></div>
@@ -116,7 +84,7 @@
                         <!-- Расписание будет добавлено через JavaScript -->
                     </div>
                     <div class="attendance-summary" id="attendance-summary">
-                        <!-- Статистика посещень -->
+                        <!-- Статистика посещений -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -144,17 +112,9 @@
 
     <!-- Перемещённый и обновлённый блок версии в правый нижний угол -->
     <div class="version-corner" id="version-corner">
-        <span>v2.4.3.8</span>
+        <span>v2.4.0</span>
     </div>
 
-    <!-- Переключатель темы закреплённый справа сверху -->
-    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Перемкнути тему" title="Тема">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-    </button>
-
     <script src="script.js"></script>
-    
 </body>
 </html>

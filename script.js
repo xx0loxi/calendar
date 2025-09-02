@@ -88,47 +88,51 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Генерация календаря
     function generateCalendar() {
+        // Используем DocumentFragment для снижения reflow/repaint
+        const fragment = document.createDocumentFragment();
         calendarDays.innerHTML = '';
-        
+
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
         const firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
         const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-        
+
         const months = [
             "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
             "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
         ];
-        
+
         // Обновляем и месяц и год
         currentMonthElement.textContent = months[currentMonth];
         currentYearElement.textContent = currentYear;
-        
+
         // Подсчет и отображение пропусков за месяц
         const absences = getMonthlyAbsences(currentYear, currentMonth);
         updateMonthAbsenceIndicator(absences);
-        
+
         // Дни предыдущего месяца
         for (let i = firstDayIndex; i > 0; i--) {
-            createDay(prevLastDay - i + 1, true);
+            fragment.appendChild(createDay(prevLastDay - i + 1, true));
         }
-        
+
         // Дни текущего месяца
         for (let i = 1; i <= lastDay.getDate(); i++) {
-            createDay(i, false);
+            fragment.appendChild(createDay(i, false));
         }
-        
+
         // Дни следующего месяца
         const daysLeft = 42 - (firstDayIndex + lastDay.getDate());
         for (let i = 1; i <= daysLeft; i++) {
-            createDay(i, true);
+            fragment.appendChild(createDay(i, true));
         }
-        
+
+        calendarDays.appendChild(fragment);
+
         // Скрываем подсказку о свайпе после первого использования
         if (localStorage.getItem('swipeHintSeen')) {
             mobileIndicator.classList.add('hidden');
         }
-        
+
         // Анимация появления календаря
         animateCalendarAppearance();
     }
@@ -221,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         dayElement.innerHTML = dayContent;
-        calendarDays.appendChild(dayElement);
+        return dayElement;
     }
     
     // Открыть расписание
@@ -594,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         lastScrollTop = scrollTop;
-    });
+    }, { passive: true });
     
     // Скрываем версию при касании
     versionInfo.addEventListener('click', function() {
@@ -612,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Скрываем подсказку о свайпе после первого использования
         localStorage.setItem('swipeHintSeen', 'true');
         mobileIndicator.classList.add('hidden');
-    });
+    }, { passive: true });
     
     calendarDays.addEventListener('touchend', (e) => {
         const touchEndX = e.changedTouches[0].screenX;
@@ -654,7 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 navigator.vibrate(50);
             }
         }
-    });
+    }, { passive: true });
     
     // Инициализация
     generateCalendar();
@@ -696,6 +700,6 @@ document.addEventListener('DOMContentLoaded', function() {
             scrollTimeout = setTimeout(() => {
                 isScrolling = false;
             }, 150);
-        });
+        }, { passive: true });
     }
 });

@@ -23,47 +23,99 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">📚</div>
-                    <h1>БН-3-2</h1>
-                </div>
-                <div class="month-nav">
-                    <button id="prev-month" class="nav-btn" aria-label="Попередній місяць">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="month-year">
-                        <h2 id="current-month">Вересень</h2>
-                        <span id="current-year">2025</span>
-                    </div>
-                    <button id="next-month" class="nav-btn" aria-label="Наступний місяць">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </header>
+        <!-- Вкладки -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" id="tab-calendar-btn" type="button">Календар</button>
+            <button class="tab-btn" id="tab-duty-btn" type="button">Чергування</button>
+        </nav>
 
-        <main>
-            <div class="calendar-wrapper">
-                <div class="weekdays">
-                    <div>Пн</div>
-                    <div>Вт</div>
-                    <div>Ср</div>
-                    <div>Чт</div>
-                    <div>Пт</div>
-                    <div>Сб</div>
-                    <div>Нд</div>
+        <!-- Календарь -->
+        <div id="tab-calendar" class="tab-content active">
+            <header>
+                <div class="header-content">
+                    <div class="logo">
+                        <div class="logo-icon">📚</div>
+                        <h1>БН-3-2</h1>
+                    </div>
+                    <div class="month-nav">
+                        <button id="prev-month" class="nav-btn" aria-label="Попередній місяць">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="month-year">
+                            <h2 id="current-month">Вересень</h2>
+                            <span id="current-year">2025</span>
+                        </div>
+                        <button id="next-month" class="nav-btn" aria-label="Наступний місяць">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="days" id="calendar-days">
-                    <!-- Дни будут добавлены через JavaScript -->
+            </header>
+            <main>
+                <div class="calendar-wrapper">
+                    <div class="weekdays">
+                        <div>Пн</div>
+                        <div>Вт</div>
+                        <div>Ср</div>
+                        <div>Чт</div>
+                        <div>Пт</div>
+                        <div>Сб</div>
+                        <div>Нд</div>
+                    </div>
+                    <div class="days" id="calendar-days">
+                        <!-- Дни будут добавлены через JavaScript -->
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
+
+        <!-- Чергування -->
+        <div id="tab-duty" class="tab-content">
+            <section class="duty-list-section">
+                <h2 class="duty-list-title">Список чергування</h2>
+                <div class="duty-list-wrapper">
+                    <table class="duty-list-table">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Прізвище</th>
+                                <th>Ім'я</th>
+                                <th>По батькові</th>
+                                <th>Дата нар.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Ахіджанов</td><td>Микола</td><td>Галустович</td><td>09.07.2008</td></tr>
+                            <tr><td>2</td><td>Бублик</td><td>Анатолій</td><td>Володимирович</td><td>21.12.2007</td></tr>
+                            <tr><td>3</td><td>Васін</td><td>Максим</td><td>Андрійович</td><td>06.07.2007</td></tr>
+                            <tr><td>4</td><td>Волоцький</td><td>Дмитро</td><td>Юрійович</td><td>08.09.2008</td></tr>
+                            <tr><td>5</td><td>Галенко</td><td>Максим</td><td>Володимирович</td><td>18.12.2008</td></tr>
+                            <tr><td>6</td><td>Джуманов</td><td>Дамір</td><td>Бахтіярович</td><td>15.2.2008</td></tr>
+                            <tr><td>7</td><td>Дрозд</td><td>Євгеній</td><td>Ігорович</td><td>17.03.2008</td></tr>
+                            <tr><td>8</td><td>Дяченко</td><td>Ігор</td><td>Андрійович</td><td>23.08.2008</td></tr>
+                            <tr><td>9</td><td>Житченко</td><td>Олександр</td><td>Юрійович</td><td>05.04.2008</td></tr>
+                            <tr><td>10</td><td>Жолонка</td><td>Дмитро</td><td>Юрійович</td><td>11.12.2008</td></tr>
+                            <tr><td>11</td><td>Заголовацький</td><td>Богдан</td><td>Вікторович</td><td>12.01.2008</td></tr>
+                            <tr><td>12</td><td>Карпишин</td><td>Ігор</td><td>Вікторович</td><td>10.12.2007</td></tr>
+                            <tr><td>13</td><td>Корніліч</td><td>Кирило</td><td>Вячеславович</td><td>25.03.2008</td></tr>
+                            <tr><td>14</td><td>Лаврушко</td><td>Максим</td><td>Олександрович</td><td>05.03.2008</td></tr>
+                            <tr><td>15</td><td>Мартин</td><td>Владислав</td><td>Євгенійович</td><td>21.03.2008</td></tr>
+                            <tr><td>16</td><td>Михайлов</td><td>Владислав</td><td>Юрійович</td><td>13.08.2008</td></tr>
+                            <tr><td>17</td><td>Поліщук</td><td>Денис</td><td>Володимирович</td><td>13.02.2008</td></tr>
+                            <tr><td>18</td><td>Решетніков</td><td>Максим</td><td>Віталійович</td><td>04.07.2008</td></tr>
+                            <tr><td>19</td><td>Селіщкін</td><td>Владислав</td><td>Віталійович</td><td>25.02.2008</td></tr>
+                            <tr><td>20</td><td>Станіслав</td><td>Станіслав</td><td>Сергійович</td><td>24.06.2008</td></tr>
+                            <tr><td>21</td><td>Терещенко</td><td>Денис</td><td>Дмитрович</td><td>12.08.2008</td></tr>
+                            <tr><td>22</td><td>Хоменко</td><td>Олександр</td><td>Романович</td><td>24.07.2008</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
         <div class="schedule-modal" id="schedule-modal">
             <div class="modal-backdrop" id="modal-backdrop"></div>
@@ -84,7 +136,7 @@
                         <!-- Расписание будет добавлено через JavaScript -->
                     </div>
                     <div class="attendance-summary" id="attendance-summary">
-                        <!-- Статистика посещений -->
+                        <!-- Статистика посещень -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -112,12 +164,26 @@
 
     <!-- Перемещённый и обновлённый блок версии в правый нижний угол -->
     <div class="version-corner" id="version-corner">
-        <span>v2.3.8</span>
+        <span>v2.3.9</span>
     </div>
 
     <script src="script.js"></script>
+    <script>
+    // Вкладки: переключение
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabBtns.forEach((btn, idx) => {
+            btn.addEventListener('click', function() {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                tabContents[idx].classList.add('active');
+            });
+        });
+    });
+    </script>
 </body>
 </html>
-
 
 

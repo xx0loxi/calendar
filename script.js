@@ -677,8 +677,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, { passive: true });
     
-    // Темизация: включаем тёмную тему и десктопный вид на мобильных
-    document.documentElement.classList.add('theme-dark');
+    // Темизация: определяем тему (localStorage -> системная), даём переключатель
+    const themeStorageKey = 'siteTheme';
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    function applyTheme(theme) {
+        document.documentElement.classList.remove('theme-dark');
+        document.documentElement.classList.remove('theme-light');
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark');
+        if (theme === 'light') document.documentElement.classList.add('theme-light');
+    }
+    const storedTheme = localStorage.getItem(themeStorageKey);
+    applyTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('theme-dark');
+            const next = isDark ? 'light' : 'dark';
+            applyTheme(next);
+            localStorage.setItem(themeStorageKey, next);
+            if ('vibrate' in navigator) navigator.vibrate(20);
+        }, { passive: true });
+    }
+
+    // Реакция на изменение системной темы, если пользователь не задал вручную
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    try {
+        media.addEventListener('change', (e) => {
+            const stored = localStorage.getItem(themeStorageKey);
+            if (!stored) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    } catch (_) {
+        // Safari/iOS старые версии
+        media.onchange = (e) => {
+            const stored = localStorage.getItem(themeStorageKey);
+            if (!stored) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        };
+    }
+    // Делаем мобильный UI визуально как десктопный по-прежнему
     if (window.innerWidth <= 600) {
         document.documentElement.classList.add('desktop-on-mobile');
     }

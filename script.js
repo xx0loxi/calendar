@@ -677,6 +677,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, { passive: true });
     
+    // Темизация: включаем тёмную тему и десктопный вид на мобильных
+    document.documentElement.classList.add('theme-dark');
+    if (window.innerWidth <= 600) {
+        document.documentElement.classList.add('desktop-on-mobile');
+    }
+
     // Инициализация
     generateCalendar();
     

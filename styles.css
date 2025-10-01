@@ -1691,13 +1691,43 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     box-shadow: inset 3px 0 0 0 var(--primary-color);
 }
 
+/* День с пропусками */
 .calendar-day.has-absences {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.12));
     border: 2px solid var(--danger-color);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(239, 68, 68, 0.1);
     animation: absenceGlow 2s ease-in-out infinite;
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Сегодняшний день с пропусками - КРАСНАЯ ТЕМА */
+.calendar-day.today.has-absences {
+    /* Используем красный градиент вместо синего */
+    background: linear-gradient(135deg, 
+        rgba(239, 68, 68, 0.20), 
+        rgba(220, 38, 38, 0.15)) !important;
+    /* Красная рамка как у обычных дней с пропуском */
+    border: 2px solid var(--danger-color) !important;
+    /* Красное свечение как у обычных дней */
+    box-shadow: 
+        0 0 20px rgba(239, 68, 68, 0.5),
+        0 0 40px rgba(239, 68, 68, 0.3),
+        inset 0 0 30px rgba(239, 68, 68, 0.15) !important;
+    animation: todayAbsenceGlow 3s ease-in-out infinite;
+}
+
+.calendar-day.today.has-absences:hover {
+    background: linear-gradient(135deg, 
+        rgba(239, 68, 68, 0.30), 
+        rgba(220, 38, 38, 0.25)) !important;
+    border: 2px solid var(--danger-color) !important;
+    box-shadow: 
+        0 0 30px rgba(239, 68, 68, 0.7),
+        0 0 50px rgba(239, 68, 68, 0.4),
+        inset 0 0 40px rgba(239, 68, 68, 0.25) !important;
+    transform: translateY(-5px) scale(1.05);
+    opacity: 1;
 }
 
 .calendar-day.has-absences:hover {
@@ -1714,6 +1744,25 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 }
 
 .calendar-day.has-absences .day-classes {
+    color: rgba(239, 68, 68, 0.8);
+    font-weight: 600;
+}
+
+/* Сегодняшний день с пропусками - красный текст */
+.calendar-day.today.has-absences .day-number {
+    color: var(--danger-color);
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* ВАЖНО: День недели красный вместо синего */
+.calendar-day.today.has-absences .day-header {
+    color: var(--danger-color) !important;
+    border-bottom-color: rgba(239, 68, 68, 0.3);
+    font-weight: 600;
+}
+
+.calendar-day.today.has-absences .day-classes {
     color: rgba(239, 68, 68, 0.8);
     font-weight: 600;
 }
@@ -1748,6 +1797,22 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     }
     50% {
         box-shadow: 0 0 25px rgba(239, 68, 68, 0.5), inset 0 0 30px rgba(239, 68, 68, 0.2);
+    }
+}
+
+/* Специальное свечение для сегодняшнего дня с пропусками */
+@keyframes todayAbsenceGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 20px rgba(239, 68, 68, 0.5),
+            0 0 40px rgba(239, 68, 68, 0.3),
+            inset 0 0 30px rgba(239, 68, 68, 0.15);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(239, 68, 68, 0.7),
+            0 0 50px rgba(239, 68, 68, 0.4),
+            inset 0 0 40px rgba(239, 68, 68, 0.25);
     }
 }
 
@@ -2564,13 +2629,60 @@ select.form-input:-webkit-autofill {
     display: block;
     text-align: right;
     padding: 1rem 1.5rem 1rem 1rem;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.04));
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06));
     color: var(--primary-color);
-    border-top: 1px solid rgba(99, 102, 241, 0.15);
+    border-top: 1px solid rgba(99, 102, 241, 0.20);
     font-size: 0.85rem;
-    font-weight: 600;
-    opacity: 0.7;
+    font-weight: 700;
+    opacity: 0.85;
     user-select: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: default;
+    box-shadow: 
+        inset 0 1px 0 rgba(99, 102, 241, 0.15),
+        0 2px 8px rgba(99, 102, 241, 0.08);
+    animation: versionGlowDesktop 15s ease-in-out infinite;
+}
+
+.version-display-bottom:hover {
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.10));
+    box-shadow: 
+        inset 0 1px 0 rgba(99, 102, 241, 0.25),
+        0 4px 16px rgba(99, 102, 241, 0.15);
+}
+
+.version-display-bottom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(99, 102, 241, 0.15), 
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.version-display-bottom:hover::before {
+    left: 100%;
+}
+
+@keyframes versionGlowDesktop {
+    0%, 100% {
+        box-shadow: 
+            inset 0 1px 0 rgba(99, 102, 241, 0.15),
+            0 2px 8px rgba(99, 102, 241, 0.08);
+    }
+    50% {
+        box-shadow: 
+            inset 0 1px 0 rgba(99, 102, 241, 0.25),
+            0 4px 12px rgba(99, 102, 241, 0.15);
+    }
 }
 
 /* Show version only in main menu on mobile */
@@ -2904,12 +3016,16 @@ select.form-input:-webkit-autofill {
 
     /* Optimized effects for better FPS on phones */
     .bottom-nav { 
-        backdrop-filter: saturate(150%) blur(6px) !important; 
-        -webkit-backdrop-filter: saturate(150%) blur(6px) !important; 
+        backdrop-filter: saturate(140%) blur(4px) !important; 
+        -webkit-backdrop-filter: saturate(140%) blur(4px) !important; 
     }
     .sidebar-overlay { 
-        backdrop-filter: blur(2px) !important; 
-        -webkit-backdrop-filter: blur(2px) !important; 
+        backdrop-filter: blur(1px) !important; 
+        -webkit-backdrop-filter: blur(1px) !important; 
+    }
+    .modal-overlay {
+        backdrop-filter: blur(3px) !important;
+        -webkit-backdrop-filter: blur(3px) !important;
     }
 
     /* Disable all repeating animations on mobile */
@@ -2921,6 +3037,13 @@ select.form-input:-webkit-autofill {
     .calendar-day.has-absences { 
         animation: none !important; 
         box-shadow: 0 0 12px rgba(239,68,68,0.35), inset 0 0 16px rgba(239,68,68,0.15); 
+    }
+    .calendar-day.today.has-absences {
+        animation: none !important;
+        box-shadow: 
+            inset 0 0 0 2px var(--danger-color),
+            0 0 18px rgba(239, 68, 68, 0.45),
+            inset 0 0 25px rgba(239, 68, 68, 0.15);
     }
     
     /* Disable glows and pulses */
@@ -2942,9 +3065,17 @@ select.form-input:-webkit-autofill {
     /* Optimize calendar rendering */
     .calendar-grid { 
         contain: layout style;
+        /* Reduce GPU pressure */
+        will-change: auto;
     }
     .calendar-day {
         contain: layout style paint;
+        /* Use 3D transform only when hovering */
+        transform: translateZ(0);
+        will-change: auto;
+    }
+    .calendar-day:active {
+        will-change: transform;
     }
     
     /* Welcome section mobile */

@@ -196,13 +196,23 @@ class ScheduleApp {
             // Make bottom nav follow the screen
             this.enableAbsoluteBottomNavForMobile();
             
-            // Обновляем календарь с учетом сохраненных пропусков (однократно после первичного рендера)
+            // Обновляем календарь с учетом сохраненных пропусков
             setTimeout(() => {
                 try {
+                    console.log('Updating calendar with saved absences...');
                     this.updateCalendarAfterAttendanceChange();
+                    this.updateMonthStatsDisplay();
                     this.enableAbsoluteBottomNavForMobile();
                 } catch (e) { console.warn('Deferred init update failed:', e); }
             }, 100);
+            
+            // Еще одно обновление через 500мс для гарантии
+            setTimeout(() => {
+                try {
+                    console.log('Final update check...');
+                    this.updateMonthStatsDisplay();
+                } catch (e) { console.warn('Final update failed:', e); }
+            }, 500);
             
             console.log('ScheduleApp initialized successfully');
         } catch (error) {
@@ -1147,28 +1157,36 @@ class ScheduleApp {
         const month = date.getMonth();
         const year = date.getFullYear();
         
+        console.log(`Counting absences for month: ${month + 1}/${year}`);
+        
         // Проходим по всем дням месяца
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         
         for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
             const dateKey = this.formatDateKey(d);
-            // Генерируем расписание для этого дня, если его нет в текущем расписании
-            let daySchedule = this.sampleSchedule[dateKey];
-            if (!daySchedule) {
+            
+            // Генерируем расписание для этого дня, если его нет
+            if (!this.sampleSchedule[dateKey]) {
                 const tempWeekSchedule = this.generateWeekSchedule(d);
-                daySchedule = tempWeekSchedule[dateKey];
+                if (tempWeekSchedule[dateKey]) {
+                    this.sampleSchedule[dateKey] = tempWeekSchedule[dateKey];
+                }
             }
             
-            if (daySchedule && daySchedule.classes) {
-                daySchedule.classes.forEach(classInfo => {
+            // ВАЖНО: используем getCombinedDaySchedule для учета замен
+            const combined = this.getCombinedDaySchedule(dateKey);
+            if (combined && combined.classes && combined.classes.length > 0) {
+                combined.classes.forEach(classInfo => {
                     if (this.attendanceData[classInfo.id] === 'absent') {
                         absencesCount++;
+                        console.log(`Found absence: ${classInfo.id} on ${dateKey}`);
                     }
                 });
             }
         }
         
+        console.log(`Total absences in month: ${absencesCount}`);
         return absencesCount;
     }
     
@@ -2236,40 +2254,57 @@ class ScheduleApp {
     }
     
     updateCalendarAfterAttendanceChange() {
-        // Update month stats with absences count
-        const monthStats = document.getElementById('monthStats');
-        if (monthStats) {
-            const weekStart = new Date(this.currentWeek);
-            weekStart.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
-            const monthAbsences = this.getMonthAbsencesCount(weekStart);
-            
-            if (monthAbsences > 0) {
-                monthStats.innerHTML = `
-                    <div class="month-absences-counter">
-                        <span class="absences-icon">⚠️</span>
-                        <span class="absences-count">${monthAbsences}</span>
-                        <span class="absences-text">${this.getPluralForm(monthAbsences, 'пропуск', 'пропуски', 'пропусків')}</span>
-                    </div>
-                `;
-                
-                // Make month title red if there are absences
-                const monthTitle = document.getElementById('monthTitle');
-                if (monthTitle) {
-                    monthTitle.classList.add('has-absences');
-                }
-            } else {
-                monthStats.innerHTML = '<div class="month-perfect">✓ Без пропусків</div>';
-                
-                // Remove red styling from month title
-                const monthTitle = document.getElementById('monthTitle');
-                if (monthTitle) {
-                    monthTitle.classList.remove('has-absences');
-                }
-            }
-        }
+        console.log('updateCalendarAfterAttendanceChange called');
+        
+        // Update month stats display
+        this.updateMonthStatsDisplay();
         
         // Update calendar days with absence badges and styling
         this.updateCalendarDaysAbsences();
+    }
+    
+    updateMonthStatsDisplay() {
+        console.log('updateMonthStatsDisplay called');
+        
+        // Update month stats with absences count
+        const monthStats = document.getElementById('monthStats');
+        if (!monthStats) {
+            console.warn('monthStats element not found');
+            return;
+        }
+        
+        // Use current displayed month/week for counting
+        const displayDate = new Date(this.currentWeek);
+        if (this.calendarView === 'month') {
+            displayDate.setDate(1); // First day of month
+        }
+        
+        const monthAbsences = this.getMonthAbsencesCount(displayDate);
+        console.log(`Month absences count: ${monthAbsences}`);
+        
+        if (monthAbsences > 0) {
+            monthStats.innerHTML = `
+                <div class="month-absences-counter">
+                    <span class="absences-icon">⚠️</span>
+                    <span class="absences-count">${monthAbsences}</span>
+                    <span class="absences-text">${this.getPluralForm(monthAbsences, 'пропуск', 'пропуски', 'пропусків')}</span>
+                </div>
+            `;
+            
+            // Make month title red if there are absences
+            const monthTitle = document.getElementById('monthTitle');
+            if (monthTitle) {
+                monthTitle.classList.add('has-absences');
+            }
+        } else {
+            monthStats.innerHTML = '<div class="month-perfect">✓ Без пропусків</div>';
+            
+            // Remove red styling from month title
+            const monthTitle = document.getElementById('monthTitle');
+            if (monthTitle) {
+                monthTitle.classList.remove('has-absences');
+            }
+        }
     }
     
     updateCalendarDaysAbsences() {

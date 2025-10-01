@@ -849,7 +849,9 @@ class ScheduleApp {
             // Update month title and stats
             if (monthTitle) {
                 const monthOptions = { month: 'long', year: 'numeric' };
-                const monthName = displayDate.toLocaleDateString('uk-UA', monthOptions);
+                let monthName = displayDate.toLocaleDateString('uk-UA', monthOptions);
+                // Убираем "р" после года (например "2025 р." -> "2025")
+                monthName = monthName.replace(/\s*р\.?$/i, '');
                 monthTitle.textContent = monthName;
             }
             

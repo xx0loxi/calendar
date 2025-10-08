@@ -148,6 +148,9 @@ class ScheduleApp {
             // Calendar view preference
             this.calendarView = 'month'; // Default to month view
             
+            // Current group selection
+            this.currentGroup = localStorage.getItem('bn32-current-group') || 'bn-3-2';
+            
             // Інициализація базового шаблона
             this.initializeBaseScheduleTemplate();
             
@@ -189,6 +192,7 @@ class ScheduleApp {
             
             this.setupEventListeners();
             this.updateCurrentDate();
+            this.updateGroupButtons();
             this.renderCalendar();
             this.updateStats();
             this.handleResize();
@@ -260,35 +264,69 @@ class ScheduleApp {
 
     // Initialize base schedule template
     initializeBaseScheduleTemplate() {
-        // Permanent weekly schedule template
-        this.weeklyScheduleTemplate = {
-            1: [ // Понеділок
-                { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' },
-                { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' },
-                { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' }
-            ],
-            2: [ // Вівторок
-                { subject: 'Технічна механіка', room: 'ауд. 302', teacher: 'Волинець' },
-                { subject: 'Промивка свердловин', room: 'ауд. 307А', teacher: 'Деркунська' },
-                { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' }
-            ],
-            3: [ // Середа
-                { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' },
-                { subject: 'Фізичне виховання', room: 'с/з', teacher: 'Кошель' },
-                { subject: 'ЗНПГ', room: 'ауд. 202', teacher: 'Сакова' },
-                { subject: "Іноземна (ЗПС)", room: 'ауд. 316', teacher: 'Почтакова' }
-            ],
-            4: [ // Четвер
-                { subject: 'Технічна механіка', room: 'ауд. 302', teacher: 'Волинець' },
-                { subject: 'Гідравліка', room: 'ауд. 310', teacher: 'Чмихун' },
-                { subject: 'Гідравліка', room: 'ауд. 310', teacher: 'Чмихун' }
-            ],
-            5: [ // П'ятниця
-                { subject: 'Промивка свердловин', room: 'ауд. 307А', teacher: 'Деркунська' },
-                { subject: 'ЗНПГ', room: 'ауд. 202', teacher: 'Сакова' },
-                { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' }
-            ]
+        // Schedule templates for both groups
+        this.scheduleTemplates = {
+            'bn-3-2': {
+                1: [ // Понеділок
+                    { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' },
+                    { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' },
+                    { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' }
+                ],
+                2: [ // Вівторок
+                    { subject: 'Технічна механіка', room: 'ауд. 302', teacher: 'Волинець' },
+                    { subject: 'Промивка свердловин', room: 'ауд. 307А', teacher: 'Деркунська' },
+                    { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' }
+                ],
+                3: [ // Середа
+                    { subject: 'MOB', room: 'ауд. 301', teacher: 'Вирста' },
+                    { subject: 'Фізичне виховання', room: 'с/з', teacher: 'Кошель' },
+                    { subject: 'ЗНПГ', room: 'ауд. 202', teacher: 'Сакова' },
+                    { subject: "Іноземна (ЗПС)", room: 'ауд. 316', teacher: 'Почтакова' }
+                ],
+                4: [ // Четвер
+                    { subject: 'Технічна механіка', room: 'ауд. 302', teacher: 'Волинець' },
+                    { subject: 'Гідравліка', room: 'ауд. 310', teacher: 'Чмихун' },
+                    { subject: 'Гідравліка', room: 'ауд. 310', teacher: 'Чмихун' }
+                ],
+                5: [ // П'ятниця
+                    { subject: 'Промивка свердловин', room: 'ауд. 307А', teacher: 'Деркунська' },
+                    { subject: 'ЗНПГ', room: 'ауд. 202', teacher: 'Сакова' },
+                    { subject: 'Буріння свердловин', room: 'ауд. 103', teacher: 'Агейчева' }
+                ]
+            },
+            'bn-2-1': {
+                1: [ // Понеділок
+                    { subject: 'Технології', room: 'ауд. 405', teacher: 'Новікова' },
+                    { subject: 'Історія України', room: 'ауд. 225', teacher: 'Коваленко' },
+                    { subject: 'Технології', room: 'ауд. 405', teacher: 'Новікова' },
+                    { subject: 'Фізична культура/Фізика і астрономія', room: 'с/з або ауд. 410', teacher: 'Кошель/Руденко' }
+                ],
+                2: [ // Вівторок
+                    { subject: 'Інформатика', room: 'ауд. 404', teacher: 'Сидорина' },
+                    { subject: 'Географія', room: 'ауд. 203', teacher: 'Тенькова' },
+                    { subject: 'Іноземна мова', room: 'ауд. 316А', teacher: 'Бовсунівський' }
+                ],
+                3: [ // Середа
+                    { subject: 'Українська мова', room: 'ауд. 407', teacher: 'Марченко' },
+                    { subject: 'Фізика і астрономія', room: 'ауд. 410', teacher: 'Руденко' },
+                    { subject: 'Фізична культура', room: 'с/з', teacher: 'Кошель' }
+                ],
+                4: [ // Четвер
+                    { subject: 'Українська література', room: 'ауд. 407', teacher: 'Марченко' },
+                    { subject: 'Інженерна та комп. графіка', room: 'ауд. 417', teacher: 'Ездула' },
+                    { subject: 'Біологія і екологія', room: 'ауд. 409', teacher: 'Сахненко' },
+                    { subject: 'Основи правознавства', room: 'ауд. 225', teacher: 'Коваленко' }
+                ],
+                5: [ // П'ятниця
+                    { subject: 'Математика', room: 'ауд. 408', teacher: 'Марченко' },
+                    { subject: 'Захист України', room: 'ауд. 227', teacher: 'Воронянський' },
+                    { subject: 'Хімія', room: 'ауд. 407', teacher: 'Андрушкевич' }
+                ]
+            }
         };
+        
+        // Set current template based on selected group
+        this.weeklyScheduleTemplate = this.scheduleTemplates[this.currentGroup];
     }
     
     // Generate schedule for specific week
@@ -325,7 +363,9 @@ class ScheduleApp {
     // Load data functions
     loadAttendanceData() {
         try {
-            const saved = localStorage.getItem('bn32-attendance');
+            // Завантажуємо дані для поточної групи
+            const storageKey = `bn32-attendance-${this.currentGroup}`;
+            const saved = localStorage.getItem(storageKey);
             return saved ? JSON.parse(saved) : {};
         } catch (error) {
             console.warn('Failed to load attendance data:', error);
@@ -482,6 +522,15 @@ class ScheduleApp {
                 this.vibrate(10);
             });
         }
+        
+        // Group switcher buttons
+        document.querySelectorAll('.group-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const group = btn.dataset.group;
+                this.switchGroup(group);
+                this.vibrate(15);
+            });
+        });
         
         // Schedule editor buttons
         const editScheduleBtn = document.getElementById('edit-schedule-btn');
@@ -1281,6 +1330,25 @@ class ScheduleApp {
                 }
             }, 300);
         }, 3000);
+    }
+    
+    showToast(message, type = 'info', duration = 3000) {
+        // Alias for showNotification
+        this.showNotification(message, type);
+    }
+    
+    updateGroupButtons() {
+        // Update active button based on current group
+        document.querySelectorAll('.group-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.group === this.currentGroup);
+        });
+        
+        // Update app title
+        const appTitle = document.getElementById('appTitle');
+        if (appTitle) {
+            const groupName = this.currentGroup === 'bn-3-2' ? 'БН-3-2' : 'БН 2-1';
+            appTitle.textContent = `Розклад ${groupName}`;
+        }
     }
 
     handleResize() {
@@ -2193,6 +2261,67 @@ class ScheduleApp {
         this.vibrate(10);
     }
     
+    switchGroup(group) {
+        console.log(`Switching from ${this.currentGroup} to ${group}`);
+        
+        if (this.currentGroup === group) {
+            console.log('Already on this group');
+            return;
+        }
+        
+        // Додаємо анімацію переключення
+        const calendarGrid = document.getElementById('calendarGrid');
+        const calendarContainer = document.querySelector('.calendar-container');
+        
+        if (calendarGrid) calendarGrid.classList.add('switching');
+        if (calendarContainer) calendarContainer.classList.add('switching');
+        
+        // Затримка для анімації
+        setTimeout(() => {
+            // Save current group
+            this.currentGroup = group;
+            localStorage.setItem('bn32-current-group', group);
+            
+            // Завантажуємо дані відвідуваності для нової групи
+            this.attendanceData = this.loadAttendanceData();
+            
+            // Update schedule template
+            this.weeklyScheduleTemplate = this.scheduleTemplates[group];
+            
+            // Update active button
+            document.querySelectorAll('.group-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.group === group);
+            });
+            
+            // Update app title
+            const appTitle = document.getElementById('appTitle');
+            if (appTitle) {
+                const groupName = group === 'bn-3-2' ? 'БН-3-2' : 'БН 2-1';
+                appTitle.textContent = `Розклад ${groupName}`;
+            }
+            
+            // Regenerate schedule
+            this.sampleSchedule = this.generateWeekSchedule(this.currentWeek);
+            
+            // Re-render calendar
+            this.renderCalendar();
+            this.updateStats();
+            this.updateCalendarAfterAttendanceChange();
+            
+            // Прибираємо класи анімації
+            setTimeout(() => {
+                if (calendarGrid) calendarGrid.classList.remove('switching');
+                if (calendarContainer) calendarContainer.classList.remove('switching');
+            }, 50);
+            
+            // Show notification
+            const groupName = group === 'bn-3-2' ? 'БН-3-2' : 'БН 2-1';
+            this.showToast(`Переключено на групу ${groupName}`, 'success', 2000);
+            
+            console.log(`Group switched to ${group}`);
+        }, 250);
+    }
+    
     changeFontSize(size) {
         console.log(`Changing font size to: ${size}`);
         document.body.className = document.body.className.replace(/font-(small|medium|large)/g, '');
@@ -2402,7 +2531,9 @@ class ScheduleApp {
     
     saveAttendanceData() {
         try {
-            localStorage.setItem('bn32-attendance', JSON.stringify(this.attendanceData));
+            // Зберігаємо дані для поточної групи
+            const storageKey = `bn32-attendance-${this.currentGroup}`;
+            localStorage.setItem(storageKey, JSON.stringify(this.attendanceData));
         } catch (error) {
             console.warn('Failed to save attendance data:', error);
         }

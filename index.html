@@ -15,13 +15,13 @@
     <meta name="format-detection" content="telephone=no">
     
     <!-- Preload hints for performance -->
-    <link rel="preload" href="styles.css?v=9.3.6" as="style">
-    <link rel="preload" href="script-fixed.js?v=9.3.6" as="script">
+    <link rel="preload" href="styles.css?v=9.3.7a" as="style">
+    <link rel="preload" href="script-fixed.js?v=9.3.7a" as="script">
     
     <!-- DNS prefetch for external resources -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <title>Розклад БН-3-2</title>
-    <link rel="stylesheet" href="styles.css?v=9.3.6">
+    <link rel="stylesheet" href="styles.css?v=9.3.7a">
     <meta name="theme-color" content="#6366f1">
     <meta name="description" content="Інтерактивний розклад занять для групи БН-3-2">
     <meta name="keywords" content="розклад, БН-3-2, заняття, університет, студенти">
@@ -74,7 +74,7 @@
                 <!-- Version Display - Below calendar on the right -->
                 <div class="version-display-bottom" role="status" aria-label="Версія програми">
                     <span class="update-indicator"></span>
-                    <span class="version-text">v9.3.6 release</span>
+                    <span class="version-text">v9.3.7a release</span>
                 </div>
             </div>
         </div>
@@ -290,10 +290,10 @@
 
     <script>
         // Force reset calendar view to month for version 9.3
-        if (localStorage.getItem('bn32-app-version') !== '9.3.6') {
+        if (localStorage.getItem('bn32-app-version') !== '9.3.7a') {
             localStorage.setItem('bn32-calendar-view', 'month');
-            localStorage.setItem('bn32-app-version', '9.3.6');
-            console.log('Updated to version 9.3.6 - Separate attendance tracking per group');
+            localStorage.setItem('bn32-app-version', '9.3.7a');
+            console.log('Updated to version 9.3.7a - Separate attendance tracking per group');
         }
     </script>
     <!-- One-time per-version update toast: shows once after version change -->
@@ -331,7 +331,7 @@
         })();
     </script>
     
-    <script src="script-fixed.js?v=9.3.6"></script>
+    <script src="script-fixed.js?v=9.3.7a"></script>
     
     <!-- Service Worker Registration -->
     <script>

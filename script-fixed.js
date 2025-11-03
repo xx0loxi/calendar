@@ -110,7 +110,7 @@ class PerformanceManager {
     }
 }
 
-// Глобальный обработчик ошибок
+// Глобальний обработчик ошибок
 window.addEventListener('error', function(e) {
     console.error('Global error caught:', e.error);
     // Не показываем ошибки пользователям, только логируем
@@ -133,7 +133,7 @@ class ScheduleApp {
             // Initialize performance manager first
             this.performance = new PerformanceManager();
             
-            // Основные свойства
+            // Основні свойства
             this.currentWeek = new Date();
             this.selectedDate = null;
             this.isMobile = window.innerWidth <= 768;
@@ -906,6 +906,7 @@ class ScheduleApp {
             
             // Update month stats with absences count (optimized)
             if (monthStats) {
+                // Check if there are absences for the current month
                 const monthAbsences = this.getMonthAbsencesCount(displayDate);
                 if (monthAbsences > 0) {
                     monthStats.innerHTML = `
@@ -915,8 +916,15 @@ class ScheduleApp {
                             <span class="absences-text">${this.getPluralForm(monthAbsences, 'пропуск', 'пропуски', 'пропусків')}</span>
                         </div>
                     `;
+                    // ensure month title highlighted when absences exist
+                    if (monthTitle) monthTitle.classList.add('has-absences');
                 } else {
                     monthStats.innerHTML = '<div class="month-perfect">✓ Без пропусків</div>';
+                    // Remove red highlight if no absences
+                    if (monthTitle) {
+                        monthTitle.classList.remove('has-absences');
+                        monthTitle.classList.remove('highlight-absences'); // legacy
+                    }
                 }
             }
             
@@ -1384,6 +1392,32 @@ class ScheduleApp {
         // Show modal
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        // Ensure modal is visible when opened: scroll page or container so modal is centered
+        // Use a small timeout to allow DOM/CSS to update first
+        setTimeout(() => {
+            try {
+                // If modal is positioned in document flow, this will bring it to center of viewport
+                if (typeof modal.scrollIntoView === 'function') {
+                    modal.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                }
+
+                // Additionally, if modal is fixed but page is scrolled (some layouts), adjust scroll so user sees it
+                const rect = modal.getBoundingClientRect ? modal.getBoundingClientRect() : null;
+                if (rect) {
+                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                        const delta = rect.top - (window.innerHeight / 2) + (rect.height / 2);
+                        window.scrollBy({ top: delta, behavior: 'smooth' });
+                    }
+                }
+
+                // Focus first focusable element inside modal to improve accessibility and may trigger browser scroll
+                const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable && typeof focusable.focus === 'function') focusable.focus({ preventScroll: false });
+            } catch (e) {
+                // swallow any errors — this is a best-effort UX improvement
+                console.warn('Auto-scroll to modal failed', e);
+            }
+        }, 60);
     }
 
     renderScheduleDetails(container, schedule, dateKey) {
@@ -1795,7 +1829,7 @@ class ScheduleApp {
                     <div class="monthly-progress">
                         <div class="progress-indicator">
                             <div class="progress-text">
-                                Текущий месяц: <strong>${stats.currentMonthAbsences} пропусков</strong>
+                                Текущий месяц: <strong>${stats.currentMonthAbsences} пропусків</strong>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${Math.min(stats.currentMonthAbsences / 10 * 100, 100)}%"></div>
@@ -1970,6 +2004,7 @@ class ScheduleApp {
 
     vibrate(duration = 10) {
         if (!this.vibrationEnabled) return false;
+       
         if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return false;
         try {
             // Cancel any ongoing vibration before starting a new one
@@ -2410,9 +2445,8 @@ class ScheduleApp {
             displayDate.setDate(1); // First day of month
         }
         
+        // Check if there are absences for the current month
         const monthAbsences = this.getMonthAbsencesCount(displayDate);
-        console.log(`Month absences count: ${monthAbsences}`);
-        
         if (monthAbsences > 0) {
             monthStats.innerHTML = `
                 <div class="month-absences-counter">
@@ -2421,19 +2455,16 @@ class ScheduleApp {
                     <span class="absences-text">${this.getPluralForm(monthAbsences, 'пропуск', 'пропуски', 'пропусків')}</span>
                 </div>
             `;
-            
-            // Make month title red if there are absences
-            const monthTitle = document.getElementById('monthTitle');
+            // Ensure month title shows absence highlight when there are absences
             if (monthTitle) {
                 monthTitle.classList.add('has-absences');
             }
         } else {
             monthStats.innerHTML = '<div class="month-perfect">✓ Без пропусків</div>';
-            
-            // Remove red styling from month title
-            const monthTitle = document.getElementById('monthTitle');
+            // Remove red highlight if no absences
             if (monthTitle) {
                 monthTitle.classList.remove('has-absences');
+                monthTitle.classList.remove('highlight-absences'); // legacy
             }
         }
     }

@@ -15,13 +15,13 @@
     <meta name="format-detection" content="telephone=no">
     
     <!-- Preload hints for performance -->
-    <link rel="preload" href="styles.css?v=9.3.1" as="style">
-    <link rel="preload" href="script-fixed.js?v=9.3.1" as="script">
+    <link rel="preload" href="styles.css?v=9.3.6" as="style">
+    <link rel="preload" href="script-fixed.js?v=9.3.6" as="script">
     
     <!-- DNS prefetch for external resources -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <title>Розклад БН-3-2</title>
-    <link rel="stylesheet" href="styles.css?v=9.3.1">
+    <link rel="stylesheet" href="styles.css?v=9.3.6">
     <meta name="theme-color" content="#6366f1">
     <meta name="description" content="Інтерактивний розклад занять для групи БН-3-2">
     <meta name="keywords" content="розклад, БН-3-2, заняття, університет, студенти">
@@ -74,7 +74,7 @@
                 <!-- Version Display - Below calendar on the right -->
                 <div class="version-display-bottom" role="status" aria-label="Версія програми">
                     <span class="update-indicator"></span>
-                    <span class="version-text">v9.3.1 release</span>
+                    <span class="version-text">v9.3.6 release</span>
                 </div>
             </div>
         </div>
@@ -290,14 +290,48 @@
 
     <script>
         // Force reset calendar view to month for version 9.3
-        if (localStorage.getItem('bn32-app-version') !== '9.3.1') {
+        if (localStorage.getItem('bn32-app-version') !== '9.3.6') {
             localStorage.setItem('bn32-calendar-view', 'month');
-            localStorage.setItem('bn32-app-version', '9.3.1');
-            console.log('Updated to version 9.3.1 - Separate attendance tracking per group');
+            localStorage.setItem('bn32-app-version', '9.3.6');
+            console.log('Updated to version 9.3.6 - Separate attendance tracking per group');
         }
     </script>
+    <!-- One-time per-version update toast: shows once after version change -->
+    <script>
+        (function(){
+            try {
+                var current = localStorage.getItem('bn32-app-version') || 'unknown';
+                var seenKey = 'bn32-app-version-seen';
+                var seen = localStorage.getItem(seenKey);
+
+                // If user hasn't seen this version yet, show small top-right toast for 3s
+                if (current && seen !== current) {
+                    var toast = document.createElement('div');
+                    toast.className = 'update-toast';
+                    toast.setAttribute('role','status');
+                    toast.setAttribute('aria-live','polite');
+                    toast.textContent = 'Новое обновление — ' + current;
+                    document.body.appendChild(toast);
+
+                    // trigger show animation
+                    requestAnimationFrame(function(){ toast.classList.add('show'); });
+
+                    // mark as seen immediately so it won't show again
+                    try { localStorage.setItem(seenKey, current); } catch(e) { /* ignore */ }
+
+                    // auto-hide after 3 seconds
+                    setTimeout(function(){
+                        toast.classList.remove('show');
+                        setTimeout(function(){ if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+                    }, 3000);
+                }
+            } catch (err) {
+                console.error('Update toast error', err);
+            }
+        })();
+    </script>
     
-    <script src="script-fixed.js?v=9.3.1"></script>
+    <script src="script-fixed.js?v=9.3.6"></script>
     
     <!-- Service Worker Registration -->
     <script>

@@ -46,6 +46,40 @@
     --panel-darken-opacity: 0.06;
 }
 
+/* Additional aggressive mobile performance tweaks when JS detects low-end device */
+.performance-mode {
+    /* Reduce heavy visual effects */
+    --shadow-xl: none;
+    --shadow: none;
+}
+
+.performance-mode .modal-overlay,
+.performance-mode .bottom-nav,
+.performance-mode .calendar-day,
+.performance-mode .version-display,
+.performance-mode .month-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+/* Make scrolling smoother on iOS */
+.calendar-grid, .modal {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Reduce paint and reflows for interactive controls on mobile */
+button, a, .nav-item, .group-btn, .menu-toggle {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hint to browser for compositing */
+.calendar-day, .modal {
+    will-change: transform, opacity;
+}
+
+
 /* Dark Theme */
 @media (prefers-color-scheme: dark) {
     :root {
@@ -1284,6 +1318,35 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 }
 
 /* Theme option swatches for new themes */
+
+/* One-time update toast (top-right) */
+.update-toast {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg,#111827,#374151);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    z-index: 12000;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .28s ease, transform .28s ease;
+    pointer-events: none;
+    max-width: 280px;
+    text-align: center;
+}
+.update-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+@media (max-width: 480px) {
+    .update-toast { right: 10px; left: 10px; max-width: calc(100% - 20px); font-size: 0.82rem; }
+}
 .theme-btn[data-theme="solar"] {
     background: linear-gradient(135deg, #ffb224, #f59e0b);
     color: #1f1302;

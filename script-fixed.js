@@ -110,6 +110,39 @@ class PerformanceManager {
     }
 }
 
+// Add default passive listeners for touch/scroll events to improve scroll performance on mobile
+(function enablePassiveDefaults(){
+    let supportsPassive = false;
+    try {
+        const opts = Object.defineProperty({}, 'passive', {
+            get() { supportsPassive = true; }
+        });
+        window.addEventListener('test-passive', null, opts);
+        window.removeEventListener('test-passive', null, opts);
+    } catch (e) {}
+
+    if (!supportsPassive) return;
+
+    const originalAdd = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+        try {
+            // For high-frequency events prefer passive unless explicitly specified
+            const passiveEvents = ['touchstart','touchmove','wheel','scroll'];
+            if (passiveEvents.indexOf(type) !== -1) {
+                if (options === undefined || typeof options === 'boolean') {
+                    return originalAdd.call(this, type, listener, { passive: true, capture: false });
+                }
+                if (typeof options === 'object' && options.passive === undefined) {
+                    options = Object.assign({}, options, { passive: true });
+                }
+            }
+        } catch (e) {
+            // fallback to original
+        }
+        return originalAdd.call(this, type, listener, options);
+    };
+})();
+
 // Глобальний обработчик ошибок
 window.addEventListener('error', function(e) {
     console.error('Global error caught:', e.error);

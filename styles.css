@@ -122,72 +122,67 @@ button, a, .nav-item, .group-btn, .menu-toggle {
         will-change: auto;
     }
     
-    /* Disable expensive effects on ALL mobile devices for better performance */
-    @media (max-width: 768px) {
-        /* Reduce backdrop-filter blur for better performance */
-        .bottom-nav {
-            backdrop-filter: saturate(160%) blur(6px) !important;
-            -webkit-backdrop-filter: saturate(160%) blur(6px) !important;
-        }
-        
-        .modal-overlay {
-            backdrop-filter: blur(4px) !important;
-            -webkit-backdrop-filter: blur(4px) !important;
-        }
-        
-        /* Disable hover effects on mobile - they cause lag and don't work on touch */
-        .calendar-day:hover {
-            transform: none !important;
-            box-shadow: var(--shadow) !important;
-        }
-        
-        .nav-btn:hover {
-            transform: none !important;
-        }
-        
-        .bottom-tab:hover {
-            transform: none !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.06) !important;
-        }
-        
-        .theme-btn:hover,
-        .nav-item:hover {
-            transform: none !important;
-        }
+    /* Reduce backdrop-filter blur for better performance */
+    .bottom-nav {
+        backdrop-filter: saturate(160%) blur(6px) !important;
+        -webkit-backdrop-filter: saturate(160%) blur(6px) !important;
+    }
+    
+    .modal-overlay {
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+    }
+    
+    /* Disable hover effects on mobile - they cause lag and don't work on touch */
+    .calendar-day:hover {
+        transform: none !important;
+        box-shadow: var(--shadow) !important;
+    }
+    
+    .nav-btn:hover {
+        transform: none !important;
+    }
+    
+    .bottom-tab:hover {
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.06) !important;
+    }
+    
+    .theme-btn:hover,
+    .nav-item:hover {
+        transform: none !important;
     }
     
     /* Optimized mobile touch interactions */
-    @media (max-width: 768px) {
-        .calendar-day {
-            transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
-        }
-        
-        .calendar-day:active {
-            transform: scale(0.96) translateZ(0);
-            background-color: var(--bg-secondary);
-            border-color: var(--primary-color);
-            transition: transform 0.08s cubic-bezier(0.4, 0, 0.6, 1), 
-                        background-color 0.08s ease,
-                        border-color 0.08s ease;
-        }
-        
-        /* Faster, simpler animations for mobile */
-        .bottom-tab {
-            transition: background-color 0.12s ease, transform 0.12s ease;
-        }
-        
-        .nav-btn {
-            transition: background-color 0.12s ease, transform 0.12s ease;
-        }
-        
-        /* Disable complex animations */
-        .bottom-tab.active {
-            animation: none !important;
-        }
-        
-        .bottom-nav::after {
-            animation: none !important;
-        }
+    .calendar-day {
+        transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+    }
+    
+    .calendar-day:active {
+        transform: scale(0.96) translateZ(0);
+        background-color: var(--bg-secondary);
+        border-color: var(--primary-color);
+        transition: transform 0.08s cubic-bezier(0.4, 0, 0.6, 1), 
+                    background-color 0.08s ease,
+                    border-color 0.08s ease;
+    }
+    
+    /* Faster, simpler animations for mobile */
+    .bottom-tab {
+        transition: background-color 0.12s ease, transform 0.12s ease;
+    }
+    
+    .nav-btn {
+        transition: background-color 0.12s ease, transform 0.12s ease;
+    }
+    
+    /* Disable complex animations */
+    .bottom-tab.active {
+        animation: none !important;
+    }
+    
+    .bottom-nav::after {
+        animation: none !important;
     }
 }
 
@@ -1871,25 +1866,25 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.12));
     border: 2px solid var(--danger-color);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(239, 68, 68, 0.1);
-    animation: absenceGlow 2s ease-in-out infinite;
-    opacity: 1;
-    transform: translateY(0);
+    /* Використовуємо тільки fadeInUp для послідовної появи */
+    animation: fadeInUp 0.6s ease-out, absenceGlow 2s ease-in-out 0.6s infinite;
 }
 
-/* Сегодняшний день с пропусками - КРАСНАЯ ТЕМА */
+/* Сегодняшній день з пропусками - ЧЕРВОНА ТЕМА */
 .calendar-day.today.has-absences {
-    /* Используем красный градиент вместо синего */
+    /* Використовуємо червоний градієнт замість синього */
     background: linear-gradient(135deg, 
         rgba(239, 68, 68, 0.20), 
         rgba(220, 38, 38, 0.15)) !important;
-    /* Красная рамка как у обычных дней с пропуском */
+    /* Червона рамка як у звичайних днів з пропуском */
     border: 2px solid var(--danger-color) !important;
-    /* Красное свечение как у обычных дней */
+    /* Червоне свічення як у звичайних днів */
     box-shadow: 
         0 0 20px rgba(239, 68, 68, 0.5),
         0 0 40px rgba(239, 68, 68, 0.3),
         inset 0 0 30px rgba(239, 68, 68, 0.15) !important;
-    animation: todayAbsenceGlow 3s ease-in-out infinite;
+    /* Використовуємо тільки fadeInUp для послідовної появи */
+    animation: fadeInUp 0.6s ease-out, todayAbsenceGlow 3s ease-in-out 0.6s infinite;
 }
 
 .calendar-day.today.has-absences:hover {
@@ -6815,7 +6810,7 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
         background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.12)) !important;
         animation: todayGlow 3s ease-in-out infinite;
     }
-    
+
     .calendar-day.today .day-number {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: white;
@@ -7187,51 +7182,6 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
         }
     }
     
-    /* Дополнительные исправления для маленьких экранов */
-    @media (max-width: 380px) {
-        .menu-toggle {
-            width: 44px;
-            height: 44px;
-            top: calc(0.5rem + var(--mobile-safe-top));
-            left: calc(0.5rem + var(--mobile-safe-left));
-        }
-        
-        .header {
-            padding-left: 3.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .calendar-day {
-            min-height: 75px !important;
-            max-height: 85px !important;
-            padding: 0.3rem 0.2rem !important;
-        }
-        
-        .calendar-day .day-number {
-            font-size: 1rem !important;
-            padding: 0.2rem !important;
-            margin: 0.1rem 0 !important;
-        }
-        
-        .calendar-day .day-classes {
-            font-size: 0.55rem !important;
-            padding: 0.05rem 0.1rem !important;
-        }
-        
-        .calendar-grid {
-            gap: 3px !important;
-            padding: 4px !important;
-            min-height: 180px !important;
-        }
-        
-        .version-display {
-            bottom: 4rem;
-            right: 0.5rem;
-            font-size: 0.6rem;
-            padding: 0.25rem 0.5rem;
-        }
-    }
-    
     /* Улучшенные метки для сенсорного управления */
     label {
         padding: 0.5rem;
@@ -7240,7 +7190,7 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
         touch-action: manipulation;
         cursor: pointer;
     }
-    }
+
     .calendar-day.has-absences .day-number {
         color: #dc2626 !important;
         font-weight: 900 !important;

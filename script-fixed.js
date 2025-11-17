@@ -220,9 +220,6 @@ class ScheduleApp {
             // Cache DOM elements first for better performance
             this.cacheDOM();
             
-            // ПРИНУДИТЕЛЬНОЕ ЗАКРЫТИЕ МЕНЮ ПРИ ИНИЦИАЛИЗАЦИИ (фикс для iPhone)
-            this.ensureMenuClosed();
-            
             this.setupEventListeners();
             this.updateCurrentDate();
             this.updateGroupButtons();
@@ -232,24 +229,6 @@ class ScheduleApp {
 
             // Make bottom nav follow the screen
             this.enableAbsoluteBottomNavForMobile();
-            
-            // Обновляем календарь с учетом сохраненных пропусков
-            setTimeout(() => {
-                try {
-                    console.log('Updating calendar with saved absences...');
-                    this.updateCalendarAfterAttendanceChange();
-                    this.updateMonthStatsDisplay();
-                    this.enableAbsoluteBottomNavForMobile();
-                } catch (e) { console.warn('Deferred init update failed:', e); }
-            }, 100);
-            
-            // Еще одно обновление через 500мс для гарантии
-            setTimeout(() => {
-                try {
-                    console.log('Final update check...');
-                    this.updateMonthStatsDisplay();
-                } catch (e) { console.warn('Final update failed:', e); }
-            }, 500);
             
             console.log('ScheduleApp initialized successfully');
         } catch (error) {
@@ -476,31 +455,6 @@ class ScheduleApp {
                     this.navigateToSection(item.dataset.section);
                 }
             });
-        });
-        
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        if (menuToggle) menuToggle.addEventListener('click', () => this.toggleMobileMenu());
-        
-        // Menu close button
-        const menuClose = document.getElementById('menuClose');
-        if (menuClose) menuClose.addEventListener('click', () => this.closeMobileMenu());
-        
-        // Sidebar overlay
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', () => this.closeMobileMenu());
-        }
-        
-        // ESC key to close menu
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const sidebar = document.getElementById('sidebar');
-                if (sidebar && sidebar.classList.contains('active')) {
-                    this.closeMobileMenu();
-                    e.preventDefault();
-                }
-            }
         });
         
         // Cache theme buttons for faster toggling
@@ -825,16 +779,6 @@ class ScheduleApp {
         }
     }
 
-    navigateWeek(direction) {
-        console.log(`Navigate week: ${direction}`);
-        this.currentWeek.setDate(this.currentWeek.getDate() + (direction * 7));
-        this.sampleSchedule = this.generateWeekSchedule(this.currentWeek);
-        this.renderCalendar();
-        this.animateWeekTitle(direction);
-        this.animateNavigation(direction);
-        this.vibrate(10);
-    }
-
 
     animateNavigation(direction) {
         const calendar = document.getElementById('calendarGrid');
@@ -1064,19 +1008,6 @@ class ScheduleApp {
             Object.assign(this.sampleSchedule, weekSchedule);
         }
     }
-    
-    // Helper method to count Sundays in a month
-    getSundaysInMonth(year, month) {
-        let sundays = 0;
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
-            if (date.getDay() === 0) sundays++;
-        }
-        
-        return sundays;
-    }
 
     createDayElement(date, dayName, index = 0) {
         const dayElement = document.createElement('div');
@@ -1084,7 +1015,7 @@ class ScheduleApp {
         dayElement.style.animationDelay = `${index * 0.08}s`;
         
         const dateKey = this.formatDateKey(date);
-        dayElement.dataset.dateKey = dateKey; // Store date key for later use
+        dayElement.dataset.dateKey = dateKey;
         
         // Add day name header
         const dayHeader = document.createElement('div');
@@ -1094,18 +1025,18 @@ class ScheduleApp {
         
         const today = new Date();
         const isToday = date.toDateString() === today.toDateString();
-            const baseSchedule = this.sampleSchedule[dateKey];
-            const hasExtras = this.getExtrasForDate(dateKey).length > 0;
-            const hasAbsences = this.checkDayHasAbsences(dateKey);
-            const dayAbsencesCount = this.getDayAbsencesCount(dateKey);
-            
-            // Add classes
-            if (isToday) dayElement.classList.add('today');
-            if (baseSchedule || hasExtras) dayElement.classList.add('has-classes');
-            if (hasAbsences) dayElement.classList.add('has-absences');
-            
-            // Day number
-            const dayNumber = document.createElement('div');
+        const baseSchedule = this.sampleSchedule[dateKey];
+        const hasExtras = this.getExtrasForDate(dateKey).length > 0;
+        const hasAbsences = this.checkDayHasAbsences(dateKey);
+        const dayAbsencesCount = this.getDayAbsencesCount(dateKey);
+        
+        // Add classes
+        if (isToday) dayElement.classList.add('today');
+        if (baseSchedule || hasExtras) dayElement.classList.add('has-classes');
+        if (hasAbsences) dayElement.classList.add('has-absences');
+        
+        // Day number
+        const dayNumber = document.createElement('div');
         dayNumber.className = 'day-number';
         dayNumber.textContent = date.getDate();
         
@@ -1124,18 +1055,25 @@ class ScheduleApp {
         dayElement.appendChild(dayNumber);
         dayElement.appendChild(dayClasses);
         
-        // Add absence badge if there are absences
+        // Add absence badge if есть
         if (dayAbsencesCount > 0) {
-            const absenceBadge = document.createElement('div');
-            absenceBadge.className = 'day-absence-badge';
-            absenceBadge.textContent = dayAbsencesCount;
-            dayElement.appendChild(absenceBadge);
+            const badge = document.createElement('div');
+            badge.className = 'day-absence-badge';
+            badge.textContent = dayAbsencesCount;
+            dayElement.appendChild(badge);
         }
         
-        // Click handler
+        // Make day clickable
         dayElement.addEventListener('click', () => this.openDayModal(date));
         
         return dayElement;
+    }
+    
+    getDayAbsencesCount(dateKey) {
+        const combined = this.getCombinedDaySchedule(dateKey);
+        if (!combined || !combined.classes) return 0;
+        
+        return combined.classes.filter(c => this.attendanceData[c.id] === 'absent').length;
     }
 
     formatDateKey(date) {
@@ -1586,169 +1524,6 @@ class ScheduleApp {
         this.selectedDate = null;
     }
 
-    toggleMobileMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const mainContent = document.getElementById('mainContent');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const body = document.body;
-        
-        const isOpen = sidebar && sidebar.classList.contains('active');
-        const opening = !isOpen;
-        
-        // Перед открытием гарантируем видимость элементов (фикс iOS визуала)
-        if (opening) {
-            if (sidebar) sidebar.style.display = 'block';
-            if (sidebarOverlay) sidebarOverlay.style.display = 'block';
-        }
-        
-        if (sidebar) sidebar.classList.toggle('active');
-        if (menuToggle) menuToggle.classList.toggle('active');
-        if (mainContent) mainContent.classList.toggle('sidebar-open');
-        if (sidebarOverlay) sidebarOverlay.classList.toggle('active');
-        
-        // Блокировка/разблокировка прокрутки body
-        body.classList.toggle('sidebar-open');
-        if (opening) {
-            body.style.overflow = 'hidden';
-            body.style.position = 'fixed';
-            body.style.top = `-${window.scrollY}px`;
-            body.style.width = '100%';
-        } else {
-            const scrollY = body.style.top;
-            body.style.overflow = '';
-            body.style.position = '';
-            body.style.top = '';
-            body.style.width = '';
-            window.scrollTo(0, parseInt(scrollY || '0') * -1);
-            // Спрячем элементы после завершения анимации
-            setTimeout(() => {
-                if (sidebar) sidebar.style.display = 'none';
-                if (sidebarOverlay) sidebarOverlay.style.display = 'none';
-            }, 350);
-        }
-        
-        // iOS Safari fix: force DOM reflow
-        window.requestAnimationFrame(() => {
-            if (sidebar) sidebar.offsetHeight;
-            if (sidebarOverlay) sidebarOverlay.offsetHeight;
-        });
-        
-        this.vibrate(20);
-    }
-
-    closeMobileMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const mainContent = document.getElementById('mainContent');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const body = document.body;
-        
-        // iOS Safari Fix: принудительное закрытие меню
-        if (sidebar) {
-            sidebar.classList.remove('active');
-            // Force repaint on iOS
-            sidebar.style.transform = 'translateX(-100%)';
-        }
-        if (menuToggle) {
-            menuToggle.classList.remove('active');
-        }
-        if (mainContent) {
-            mainContent.classList.remove('sidebar-open');
-        }
-        if (sidebarOverlay) {
-            sidebarOverlay.classList.remove('active');
-            // Ensure overlay is hidden on iOS
-            sidebarOverlay.style.opacity = '0';
-            sidebarOverlay.style.visibility = 'hidden';
-            sidebarOverlay.style.pointerEvents = 'none';
-        }
-        
-        // Возвращаем скролл
-        body.classList.remove('sidebar-open');
-        body.style.overflow = 'auto';
-        
-        // Force layout recalculation on iOS Safari
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            window.requestAnimationFrame(() => {
-                if (sidebar) sidebar.offsetHeight; // Force reflow
-                if (sidebarOverlay) sidebarOverlay.offsetHeight; // Force reflow
-            });
-        }
-        
-        // Clear inline styles after animation и спрятать элементы
-        setTimeout(() => {
-            if (sidebar) {
-                sidebar.style.transform = '';
-                sidebar.style.display = 'none';
-            }
-            if (sidebarOverlay) {
-                sidebarOverlay.style.opacity = '';
-                sidebarOverlay.style.visibility = '';
-                sidebarOverlay.style.pointerEvents = '';
-                sidebarOverlay.style.display = 'none';
-            }
-        }, 400);
-    }
-
-    // Принудительное закрытие меню (фикс для iPhone автооткрытия)
-    ensureMenuClosed() {
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const mainContent = document.getElementById('mainContent');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const body = document.body;
-        
-        console.log('Ensuring mobile menu is closed...');
-        
-        // Убираем все active классы
-        if (sidebar) {
-            sidebar.classList.remove('active');
-            // Принудительно скрываем
-            sidebar.style.transform = 'translateX(-100%)';
-            sidebar.style.webkitTransform = 'translateX(-100%)';
-            sidebar.style.display = 'none';
-        }
-        
-        if (menuToggle) {
-            menuToggle.classList.remove('active');
-        }
-        
-        if (mainContent) {
-            mainContent.classList.remove('sidebar-open');
-        }
-        
-        if (sidebarOverlay) {
-            sidebarOverlay.classList.remove('active');
-            sidebarOverlay.style.opacity = '0';
-            sidebarOverlay.style.visibility = 'hidden';
-            sidebarOverlay.style.pointerEvents = 'none';
-            sidebarOverlay.style.display = 'none';
-        }
-        
-        // Убираем блокировку скролла
-        body.classList.remove('sidebar-open');
-        body.style.overflow = 'auto';
-        body.style.position = 'static';
-        
-        // Очищаем inline стили через небольшой таймаут
-        setTimeout(() => {
-            if (sidebar) {
-                sidebar.style.transform = '';
-                sidebar.style.webkitTransform = '';
-                // display оставляем 'none' до открытия
-            }
-            if (sidebarOverlay) {
-                sidebarOverlay.style.opacity = '';
-                sidebarOverlay.style.visibility = '';
-                sidebarOverlay.style.pointerEvents = '';
-                // display оставляем 'none' до открытия
-            }
-        }, 100);
-        
-        console.log('Mobile menu forced closed');
-    }
-    
     // Change calendar view between week and month
     changeCalendarView(viewType) {
         console.log(`Changing calendar view to: ${viewType}`);
@@ -2169,8 +1944,6 @@ class ScheduleApp {
         const bottomNav = document.getElementById('bottomNav');
         if (enabled) {
             body.classList.add('bottom-nav-enabled');
-            // Гарантируем закрытое сайд-меню
-            try { this.ensureMenuClosed && this.ensureMenuClosed(); } catch {}
             if (menuToggle) menuToggle.style.display = 'none';
         } else {
             body.classList.remove('bottom-nav-enabled');
@@ -2817,26 +2590,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         window.scheduleApp = new ScheduleApp();
 
-        // Дополнительная проверка/закрытие меню после полной загрузки
-        setTimeout(() => {
-            try { window.scheduleApp && window.scheduleApp.ensureMenuClosed && window.scheduleApp.ensureMenuClosed(); } catch {}
-        }, 200);
-
-        // iOS bfcache: при возврате на страницу убеждаемся, что меню закрыто
-        window.addEventListener('pageshow', (e) => {
-            try {
-                if (e.persisted && window.scheduleApp && window.scheduleApp.ensureMenuClosed) {
-                    window.scheduleApp.ensureMenuClosed();
-                }
-            } catch {}
-        });
-
-        // Пересчёт мобильного состояния при смене ориентации
-        window.addEventListener('orientationchange', () => {
+        window.addEventListener('resize', () => {
             try {
                 if (window.scheduleApp) {
                     window.scheduleApp.handleResize && window.scheduleApp.handleResize();
-                    window.scheduleApp.ensureMenuClosed && window.scheduleApp.ensureMenuClosed();
                 }
             } catch {}
         });

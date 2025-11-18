@@ -1,5 +1,6 @@
 // Optimized Service Worker for mobile performance
-const CACHE_NAME = 'dotify-v2.0.7-optimized';
+// Bumped version to ensure latest CSS/layout is loaded on all devices
+const CACHE_NAME = 'dotify-v2.1.0-optimized';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

@@ -1423,25 +1423,39 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 }
 
 @keyframes buttonPulse {
-    0%, 100% {
+    0% {
         transform: scale(1);
         box-shadow: 
             0 4px 16px rgba(99, 102, 241, 0.25),
             0 0 25px rgba(99, 102, 241, 0.15),
             inset 0 1px 2px rgba(255, 255, 255, 0.3);
     }
-    50% {
+    45% {
         transform: scale(1.02);
         box-shadow: 
             0 6px 24px rgba(99, 102, 241, 0.35),
             0 0 40px rgba(99, 102, 241, 0.25),
             inset 0 1px 3px rgba(255, 255, 255, 0.4);
     }
+    60% {
+        transform: scale(1.015);
+        box-shadow: 
+            0 5px 20px rgba(99, 102, 241, 0.30),
+            0 0 32px rgba(99, 102, 241, 0.20),
+            inset 0 1px 2px rgba(255, 255, 255, 0.34);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 
+            0 4px 16px rgba(99, 102, 241, 0.25),
+            0 0 25px rgba(99, 102, 241, 0.15),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
 }
 
 /* Slow, subtle glow for theme buttons */
 @keyframes themeGlow {
-    0%, 100% {
+    0% {
         box-shadow:
             0 0 0 rgba(255,255,255,0.12),
             0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent);
@@ -1451,10 +1465,20 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
             0 0 18px rgba(255,255,255,0.18),
             0 0 28px color-mix(in srgb, var(--primary-color) 35%, transparent);
     }
+    80% {
+        box-shadow:
+            0 0 8px rgba(255,255,255,0.15),
+            0 0 15px color-mix(in srgb, var(--primary-color) 15%, transparent);
+    }
+    100% {
+        box-shadow:
+            0 0 0 rgba(255,255,255,0.12),
+            0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent);
+    }
 }
 
 @keyframes versionGlow {
-    0%, 100% {
+    0% {
         box-shadow: 
             0 4px 20px rgba(99, 102, 241, 0.15),
             0 0 30px rgba(99, 102, 241, 0.1);
@@ -1463,6 +1487,16 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
         box-shadow: 
             0 6px 30px rgba(99, 102, 241, 0.25),
             0 0 50px rgba(99, 102, 241, 0.2);
+    }
+    85% {
+        box-shadow: 
+            0 5px 25px rgba(99, 102, 241, 0.20),
+            0 0 38px rgba(99, 102, 241, 0.15);
+    }
+    100% {
+        box-shadow: 
+            0 4px 20px rgba(99, 102, 241, 0.15),
+            0 0 30px rgba(99, 102, 241, 0.1);
     }
 }
 
@@ -1491,17 +1525,29 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 
 /* Minimal pulse for phones - performance optimized */
 @keyframes buttonPulseMobile {
-    0%, 100% {
+    0% {
         box-shadow:
             0 3px 12px rgba(99, 102, 241, 0.20),
             0 0 18px rgba(99, 102, 241, 0.12),
             inset 0 1px 1px rgba(255, 255, 255, 0.25);
     }
-    50% {
+    45% {
         box-shadow:
             0 4px 14px rgba(99, 102, 241, 0.25),
             0 0 24px rgba(99, 102, 241, 0.15),
             inset 0 1px 2px rgba(255, 255, 255, 0.28);
+    }
+    65% {
+        box-shadow:
+            0 3.5px 13px rgba(99, 102, 241, 0.22),
+            0 0 20px rgba(99, 102, 241, 0.13),
+            inset 0 1px 1px rgba(255, 255, 255, 0.26);
+    }
+    100% {
+        box-shadow:
+            0 3px 12px rgba(99, 102, 241, 0.20),
+            0 0 18px rgba(99, 102, 241, 0.12),
+            inset 0 1px 1px rgba(255, 255, 255, 0.25);
     }
 }
 
@@ -1529,8 +1575,10 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 
 /* Very subtle nav pulse for mobile header arrows */
 @keyframes navSoftPulse {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-1px) scale(1.02); }
+    0% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-0.6px) scale(1.01); }
+    65% { transform: translateY(-0.3px) scale(1.005); }
+    100% { transform: translateY(0) scale(1); }
 }
 
 /* Softer version glow on phones */
@@ -1826,8 +1874,9 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 @media (max-width: 768px) {
     .calendar-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        padding: 8px;
+        /* менший проміжок між днями на мобільних */
+        gap: 3px;
+        padding: 6px;
         overflow: hidden;
     }
     
@@ -1838,8 +1887,9 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     }
     
     .calendar-day {
-        min-height: 100px;
-        padding: 0.75rem;
+        min-height: 96px;
+        padding: 0.55rem 0.5rem;
+        margin: 2px;
     }
     
     .day-absence-badge {
@@ -1854,8 +1904,9 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 @media (max-width: 480px) {
     .calendar-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 4px;
-        padding: 6px;
+        /* ще менший проміжок на дуже вузьких екранах */
+        gap: 2px;
+        padding: 4px;
         overflow: hidden;
     }
     
@@ -1866,8 +1917,9 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     }
     
     .calendar-day {
-        min-height: 90px;
-        padding: 0.5rem;
+        min-height: 88px;
+        padding: 0.45rem 0.4rem;
+        margin: 1px;
     }
 }
 
@@ -2363,8 +2415,9 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 .modal-open .header,
 .modal-open .bottom-nav,
 .modal-open .calendar-container {
-    filter: blur(10px);
-    transition: filter 0.35s ease;
+    /* трохи менший blur, щоб не вантажити GPU на телефонах */
+    filter: blur(6px);
+    transition: filter 0.3s ease;
     pointer-events: none;
 }
 
@@ -2460,7 +2513,7 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
 }
 
 .modal-body {
-    padding: 1.5rem;
+    padding: 1.25rem 1.25rem 1.35rem;
 }
 
 /* Unified input styles for dark UI (fix white background) */
@@ -2509,8 +2562,8 @@ select.form-input:-webkit-autofill {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 0.85rem 0.9rem;
+    margin-bottom: 0.85rem;
     transition: var(--transition);
 }
 
@@ -2520,7 +2573,7 @@ select.form-input:-webkit-autofill {
 }
 
 .class-content {
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
 }
 
 .class-time {
@@ -2543,13 +2596,13 @@ select.form-input:-webkit-autofill {
 }
 
 .attendance-section {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.45rem;
+    padding-top: 0.45rem;
     border-top: 1px solid var(--border-color);
 }
 
 .attendance-section h5 {
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.5rem 0;
     font-size: 0.9rem;
     color: var(--text-secondary);
     font-weight: 600;
@@ -2611,11 +2664,11 @@ select.form-input:-webkit-autofill {
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     cursor: pointer;
     user-select: none;
     transition: var(--transition);
-    padding: 0.5rem 0.75rem;
+    padding: 0.35rem 0.55rem;
     border-radius: var(--border-radius);
 }
 
@@ -3704,15 +3757,16 @@ select.form-input:-webkit-autofill {
     
     .modal-header, 
     .modal-body {
-        padding: 1rem;
+        /* компактніші відступи на мобільних */
+        padding: 0.75rem 0.75rem 0.9rem;
     }
     
     .nav-btn {
         width: 44px;
         height: 44px;
         font-size: 1.2rem;
-        /* Soft breathing animation for header arrows on phones */
-        animation: navSoftPulse 10s ease-in-out infinite;
+        /* Softer breathing animation for header arrows on phones */
+        animation: navSoftPulse 14s ease-in-out infinite;
     }
     
     /* Touch-optimized interactions - Enhanced */

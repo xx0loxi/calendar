@@ -183,6 +183,8 @@ class ScheduleApp {
             
             // Current group selection
             this.currentGroup = localStorage.getItem('bn32-current-group') || 'bn-3-2';
+            this.isSwitchingGroup = false;
+            this.isMonthTransitioning = false;
             
             // Інициализація базового шаблона
             this.initializeBaseScheduleTemplate();
@@ -1402,16 +1404,58 @@ class ScheduleApp {
     
     // Navigate month for monthly view
     navigateMonth(direction) {
-        // Get current month and year
-        const currentDate = new Date(this.currentWeek);
-        currentDate.setMonth(currentDate.getMonth() + direction);
-        currentDate.setDate(1); // Set to first day of month
+        if (this.isMonthTransitioning) {
+            console.log('Month transition already running');
+            return;
+        }
+        this.isMonthTransitioning = true;
         
-        this.currentWeek = currentDate;
-        this.renderCalendar();
-        this.animateWeekTitle(direction);
-        this.animateNavigation(direction);
-        this.vibrate(10);
+        const calendarGrid = this.getElement('calendarGrid');
+        const calendarContainer = document.querySelector('.calendar-container');
+        const monthHeader = document.querySelector('.month-header');
+        const directionClass = direction > 0 ? 'transition-forward' : 'transition-backward';
+        
+        const startTransition = () => {
+            if (calendarGrid) {
+                calendarGrid.classList.add('month-transitioning', directionClass);
+            }
+            if (calendarContainer) {
+                calendarContainer.classList.add('switching');
+            }
+            if (monthHeader) {
+                monthHeader.classList.add('transitioning');
+            }
+        };
+        requestAnimationFrame(startTransition);
+        
+        const performSwitch = () => {
+            // Get current month and year
+            const currentDate = new Date(this.currentWeek);
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            currentDate.setDate(1); // Set to first day of month
+            
+            this.currentWeek = currentDate;
+            this.renderCalendar();
+            this.animateWeekTitle(direction);
+            this.animateNavigation(direction);
+            this.vibrate(10);
+            
+            const cleanup = () => {
+                if (calendarGrid) {
+                    calendarGrid.classList.remove('month-transitioning', 'transition-forward', 'transition-backward');
+                }
+                if (calendarContainer) {
+                    calendarContainer.classList.remove('switching');
+                }
+                if (monthHeader) {
+                    monthHeader.classList.remove('transitioning');
+                }
+                this.isMonthTransitioning = false;
+            };
+            setTimeout(cleanup, 320);
+        };
+        const delay = this.performance?.animationsEnabled === false ? 0 : 170;
+        setTimeout(performSwitch, delay);
     }
 
     renderScheduleView() {
@@ -1955,14 +1999,25 @@ class ScheduleApp {
             return;
         }
         
-        // Додаємо анімацію переключення
+        if (this.isSwitchingGroup) {
+            console.log('Group switch already in progress');
+            return;
+        }
+        this.isSwitchingGroup = true;
+        
         const calendarGrid = document.getElementById('calendarGrid');
         const calendarContainer = document.querySelector('.calendar-container');
+        const monthHeader = document.querySelector('.month-header');
         
-        if (calendarGrid) calendarGrid.classList.add('switching');
-        if (calendarContainer) calendarContainer.classList.add('switching');
+        const startGroupTransition = () => {
+            if (calendarGrid) calendarGrid.classList.add('switching');
+            if (calendarContainer) calendarContainer.classList.add('switching');
+            if (monthHeader) monthHeader.classList.add('transitioning');
+        };
         
-        // Затримка для анімації
+        // Start animation next frame for smoother transition
+        requestAnimationFrame(startGroupTransition);
+        
         setTimeout(() => {
             // Save current group
             this.currentGroup = group;
@@ -1994,18 +2049,21 @@ class ScheduleApp {
             this.updateStats();
             this.updateCalendarAfterAttendanceChange();
             
-            // Прибираємо класи анімації
-            setTimeout(() => {
+            const cleanupTransition = () => {
                 if (calendarGrid) calendarGrid.classList.remove('switching');
                 if (calendarContainer) calendarContainer.classList.remove('switching');
-            }, 50);
+                if (monthHeader) monthHeader.classList.remove('transitioning');
+                this.isSwitchingGroup = false;
+            };
+            
+            setTimeout(cleanupTransition, 300);
             
             // Show notification
             const groupName = group === 'bn-3-2' ? 'БН-3-2' : 'БН 2-1';
             this.showToast(`Переключено на групу ${groupName}`, 'success', 2000);
             
             console.log(`Group switched to ${group}`);
-        }, 250);
+        }, 220);
     }
     
     changeFontSize(size) {

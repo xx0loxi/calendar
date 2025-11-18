@@ -1,4 +1,4 @@
-console.log('ScheduleApp script started (optimized)');
+// ScheduleApp optimized version
 
 // Mobile performance: silence verbose logs on phones to reduce overhead (keeps errors/warnings)
 (function(){
@@ -160,7 +160,7 @@ window.addEventListener('unhandledrejection', function(e) {
 // Application State
 class ScheduleApp {
     constructor() {
-        console.log('ScheduleApp constructor called');
+        // Initialize app constructor
         
         try {
             // Initialize performance manager first
@@ -178,8 +178,8 @@ class ScheduleApp {
             this.domCache = new Map();
             this.scheduleCache = new Map();
             
-            // Calendar view preference
-            this.calendarView = 'month'; // Default to month view
+            // Calendar view is fixed to month view
+            this.calendarView = 'month';
             
             // Current group selection
             this.currentGroup = localStorage.getItem('bn32-current-group') || 'bn-3-2';
@@ -190,20 +190,11 @@ class ScheduleApp {
             // Загрузка данних
             this.attendanceData = this.loadAttendanceData();
             this.customClasses = this.loadCustomClasses();
-            this.currentTheme = this.loadTheme();
             this.loadSavedScheduleTemplate();
             this.perDayExtras = this.loadPerDayExtras();
             
-            // Load calendar view preference
-            const savedView = localStorage.getItem('bn32-calendar-view') || 'month';
-            this.calendarView = savedView;
-            
             // Генерация расписания
             this.sampleSchedule = this.generateWeekSchedule(this.currentWeek);
-            
-            // Применение настроек
-            this.applyTheme();
-            this.loadSettings();
             
             // Инициализация
             this.init();
@@ -215,22 +206,20 @@ class ScheduleApp {
 
     init() {
         try {
-            console.log('Initializing ScheduleApp...');
-            
             // Cache DOM elements first for better performance
             this.cacheDOM();
             
             this.setupEventListeners();
             this.updateCurrentDate();
             this.updateGroupButtons();
-            this.renderCalendar();
-            this.updateStats();
-            this.handleResize();
-
-            // Make bottom nav follow the screen
-            this.enableAbsoluteBottomNavForMobile();
             
-            console.log('ScheduleApp initialized successfully');
+            // Use RAF for smoother initial render
+            requestAnimationFrame(() => {
+                this.renderCalendar();
+                this.updateStats();
+                this.handleResize();
+                this.enableAbsoluteBottomNavForMobile();
+            });
         } catch (error) {
             console.error('Error during initialization:', error);
         }
@@ -446,7 +435,7 @@ class ScheduleApp {
             });
         }
         
-        // Sidebar navigation
+        // Sidebar navigation (if present in debug tools)
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => this.navigateToSection(item.dataset.section));
             item.addEventListener('keydown', (e) => {
@@ -456,60 +445,7 @@ class ScheduleApp {
                 }
             });
         });
-        
-        // Cache theme buttons for faster toggling
-        this.themeButtons = Array.from(document.querySelectorAll('.theme-btn'));
-        this.activeThemeBtn = null;
-        
-        // Initialize active theme button
-        setTimeout(() => {
-            this.updateActiveThemeButton();
-        }, 50);
 
-        // Theme selector (robust + optimized for mobile)
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.theme-btn');
-            if (!btn) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const theme = btn.dataset.theme;
-            console.log(`Theme button clicked: ${theme}, current: ${this.currentTheme}`);
-            
-            if (!theme) {
-                console.warn('No theme data found on button');
-                return;
-            }
-            
-            // Always allow theme change, even if it's the same (fixes stuck themes)
-            this.changeTheme(theme);
-            
-            // Update active button state
-            this.updateActiveThemeButton(btn);
-            
-            // Mobile-specific feedback
-            if (this.isMobile) {
-                btn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    btn.style.transform = '';
-                }, 150);
-            }
-        }, { passive: false });
-
-        // Theme list collapsible toggle
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const themeList = document.getElementById('theme-list');
-        if (themeToggleBtn && themeList) {
-            themeToggleBtn.addEventListener('click', () => {
-                const opened = themeList.classList.toggle('open');
-                themeToggleBtn.classList.toggle('open', opened);
-                themeToggleBtn.setAttribute('aria-expanded', opened ? 'true' : 'false');
-                themeList.setAttribute('aria-hidden', opened ? 'false' : 'true');
-                this.vibrate(10);
-            });
-        }
-        
         // Group switcher buttons
         document.querySelectorAll('.group-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -518,95 +454,6 @@ class ScheduleApp {
                 this.vibrate(15);
             });
         });
-        
-        // Schedule editor buttons
-        const editScheduleBtn = document.getElementById('edit-schedule-btn');
-        const resetScheduleBtn = document.getElementById('reset-schedule-btn');
-        
-        if (editScheduleBtn) editScheduleBtn.addEventListener('click', () => this.openScheduleEditor());
-        if (resetScheduleBtn) resetScheduleBtn.addEventListener('click', () => this.resetToDefaultSchedule());
-        
-        // Font size controls
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('size-btn')) {
-                const size = e.target.dataset.size;
-                this.changeFontSize(size);
-                
-                document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-            }
-        });
-        
-        // Vibration toggle
-        const vibrationToggle = document.getElementById('vibration-toggle');
-        if (vibrationToggle) {
-            vibrationToggle.addEventListener('change', (e) => {
-                this.toggleVibration(e.target.checked);
-            });
-        }
-        
-        // Group name editing
-        const saveGroupNameBtn = document.getElementById('saveGroupNameBtn');
-        if (saveGroupNameBtn) {
-            saveGroupNameBtn.addEventListener('click', () => this.saveGroupName());
-        }
-        
-        const groupNameInput = document.getElementById('groupNameInput');
-        if (groupNameInput) {
-            // Load saved group name
-            const savedGroupName = localStorage.getItem('bn32-group-name') || 'БН-3-2';
-            groupNameInput.value = savedGroupName;
-            this.updateAppTitle(savedGroupName);
-            
-            // Save on Enter key
-            groupNameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    this.saveGroupName();
-                    e.preventDefault();
-                }
-            });
-        }
-        
-        // Calendar view controls
-        const weekViewRadio = document.getElementById('week-view');
-        const monthViewRadio = document.getElementById('month-view');
-        
-        if (weekViewRadio && monthViewRadio) {
-            // Set radio buttons based on loaded preference
-            if (this.calendarView === 'month') {
-                monthViewRadio.checked = true;
-                weekViewRadio.checked = false;
-            } else {
-                weekViewRadio.checked = true;
-                monthViewRadio.checked = false;
-            }
-            
-            // Add event listeners
-            weekViewRadio.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.changeCalendarView('week');
-                    this.vibrate(10);
-                }
-            });
-            
-            monthViewRadio.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.changeCalendarView('month');
-                    this.vibrate(10);
-                }
-            });
-        }
-
-        // Bottom nav toggle
-        const bottomToggle = document.getElementById('bottom-nav-toggle');
-        if (bottomToggle) {
-            bottomToggle.addEventListener('change', (e) => {
-                const enabled = e.target.checked;
-                localStorage.setItem('bn32-bottom-nav', enabled ? 'true' : 'false');
-                this.applyBottomNav(enabled);
-                this.vibrate(10);
-            });
-        }
 
         // Bottom nav clicks
         const bottomNav = document.getElementById('bottomNav');
@@ -713,8 +560,6 @@ class ScheduleApp {
 
     navigateToSection(sectionId) {
         try {
-            console.log(`Navigating to section: ${sectionId}`);
-            
             // INSTANTLY scroll to top (no smooth scroll)
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
@@ -738,13 +583,10 @@ class ScheduleApp {
             const targetSection = document.getElementById(`${sectionId}-section`);
             if (targetSection) {
                 targetSection.classList.add('active');
-                console.log(`Section ${sectionId} activated`);
                 // Force another scroll to top after section change
                 requestAnimationFrame(() => {
                     window.scrollTo(0, 0);
                 });
-            } else {
-                console.error(`Section not found: ${sectionId}-section`);
             }
 
             // Sync bottom nav active state
@@ -931,12 +773,12 @@ class ScheduleApp {
             // Single DOM update for better performance
             grid.appendChild(fragment);
             
-            // Force layout calculation if needed for animations
+            // Trigger animations with RAF for better performance
             if (this.performance.animationsEnabled) {
-                grid.offsetHeight; // Force reflow
+                requestAnimationFrame(() => {
+                    grid.offsetHeight; // Force reflow for animations
+                });
             }
-            
-            console.log('Calendar rendered successfully');
             
         } catch (error) {
             console.error('Error rendering calendar:', error);
@@ -955,7 +797,7 @@ class ScheduleApp {
             fragment.appendChild(dayElement);
         }
         
-        console.log(`Week view: rendered 5 weekdays (Mon-Fri)`);
+        // Week view rendered
     }
     
     // Render month view (тільки Пн-Пт, без субот і неділь)
@@ -993,7 +835,7 @@ class ScheduleApp {
             renderedDays++;
         }
         
-        console.log(`Month view: rendered ${renderedDays} days (Mon-Fri only) for ${monthStart.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' })}`);
+        // Month view: ${renderedDays} days rendered
     }
     
     // Generate schedule for entire month
@@ -1339,12 +1181,13 @@ class ScheduleApp {
 
     openDayModal(date) {
         this.selectedDate = date;
-        const modal = document.getElementById('modalOverlay');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalPanel = document.getElementById('modal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
         
-        if (!modal || !modalTitle || !modalBody) {
-            console.error('Modal elements not found:', { modal: !!modal, modalTitle: !!modalTitle, modalBody: !!modalBody });
+        if (!modalOverlay || !modalTitle || !modalBody) {
+            console.error('Modal elements not found:', { modalOverlay: !!modalOverlay, modalTitle: !!modalTitle, modalBody: !!modalBody });
             return;
         }
         
@@ -1361,31 +1204,30 @@ class ScheduleApp {
         this.renderScheduleDetails(modalBody, combined, dateKey);
         
         // Show modal
-        modal.classList.add('active');
+        const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        this.lastScrollPosition = currentScrollY;
+        modalOverlay.classList.add('active');
+        document.body.classList.add('modal-open');
         document.body.style.overflow = 'hidden';
-        // Ensure modal is visible when opened: scroll page or container so modal is centered
-        // Use a small timeout to allow DOM/CSS to update first
+        const scrollTarget = modalPanel || modalOverlay;
+        const needsWindowScroll = currentScrollY > 40;
+        // Невелика затримка, щоб DOM/CSS встигли оновитися перед автопрокруткою
         setTimeout(() => {
             try {
-                // If modal is positioned in document flow, this will bring it to center of viewport
-                if (typeof modal.scrollIntoView === 'function') {
-                    modal.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                // Для стабільності не використовуємо scrollIntoView/scrollBy з додатковими обчисленнями
+                // Якщо користувач сильно прокрутив сторінку вниз, просто м'яко повертаємося до верху
+                if (needsWindowScroll) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
 
-                // Additionally, if modal is fixed but page is scrolled (some layouts), adjust scroll so user sees it
-                const rect = modal.getBoundingClientRect ? modal.getBoundingClientRect() : null;
-                if (rect) {
-                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                        const delta = rect.top - (window.innerHeight / 2) + (rect.height / 2);
-                        window.scrollBy({ top: delta, behavior: 'smooth' });
-                    }
+                // Фокус всередині модального вікна (без додаткового скролу від браузера)
+                const focusScope = modalPanel || modalOverlay;
+                const focusable = focusScope?.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable && typeof focusable.focus === 'function') {
+                    focusable.focus({ preventScroll: true });
                 }
-
-                // Focus first focusable element inside modal to improve accessibility and may trigger browser scroll
-                const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                if (focusable && typeof focusable.focus === 'function') focusable.focus({ preventScroll: false });
             } catch (e) {
-                // swallow any errors — this is a best-effort UX improvement
+                // swallow any errors — це лише покращення UX
                 console.warn('Auto-scroll to modal failed', e);
             }
         }, 60);
@@ -1513,14 +1355,19 @@ class ScheduleApp {
     }
 
     closeModal() {
-        const modal = document.getElementById('modalOverlay');
-        if (modal) {
-            modal.classList.remove('active');
-            // Wait for animation to complete before cleaning up
-            setTimeout(() => {
-                document.body.style.overflow = 'auto';
-            }, 400);
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
         }
+        const restoreScroll = () => {
+            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
+            if (typeof this.lastScrollPosition === 'number') {
+                window.scrollTo({ top: this.lastScrollPosition, behavior: 'auto' });
+                this.lastScrollPosition = null;
+            }
+        };
+        setTimeout(restoreScroll, 350);
         this.selectedDate = null;
     }
 
@@ -1555,8 +1402,6 @@ class ScheduleApp {
     
     // Navigate month for monthly view
     navigateMonth(direction) {
-        console.log(`Navigate month: ${direction}`);
-        
         // Get current month and year
         const currentDate = new Date(this.currentWeek);
         currentDate.setMonth(currentDate.getMonth() + direction);

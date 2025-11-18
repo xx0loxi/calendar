@@ -122,15 +122,30 @@ button, a, .nav-item, .group-btn, .menu-toggle {
         will-change: auto;
     }
     
+    /* Покращена анімація появи днів календаря */
+    .calendar-day {
+        animation: mobileSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    
     /* Reduce backdrop-filter blur for better performance */
     .bottom-nav {
-        backdrop-filter: saturate(160%) blur(6px) !important;
-        -webkit-backdrop-filter: saturate(160%) blur(6px) !important;
+        backdrop-filter: saturate(160%) blur(4px) !important;
+        -webkit-backdrop-filter: saturate(160%) blur(4px) !important;
+    }
+    
+    /* Оптимізація header для плавної появи */
+    .header {
+        animation: slideInFromTop 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
     
     .modal-overlay {
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
+        backdrop-filter: blur(3px) !important;
+        -webkit-backdrop-filter: blur(3px) !important;
+    }
+    
+    /* Плавна поява модального вікна */
+    .modal-overlay.active .modal {
+        animation: modalBounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
     
     /* Disable hover effects on mobile - they cause lag and don't work on touch */
@@ -1596,35 +1611,59 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.8));
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.9));
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    /* Добавлена маленькая подсветка */
+    font-weight: 700;
+    font-size: 0.95rem;
+    /* ЯСКРАВЕ СВІТІННЯ */
     box-shadow: 
-        0 4px 15px rgba(239, 68, 68, 0.35),
-        0 0 20px rgba(239, 68, 68, 0.2),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    animation: counterPulse 10s ease-in-out infinite;
-    backdrop-filter: blur(10px);
+        0 6px 25px rgba(239, 68, 68, 0.6),
+        0 0 40px rgba(239, 68, 68, 0.5),
+        0 0 60px rgba(239, 68, 68, 0.3),
+        0 0 80px rgba(239, 68, 68, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    animation: absenceBadgeGlow 2s ease-in-out infinite;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: visible;
+    transform: translateZ(0);
+}
+
+/* Додаткове зовнішнє світіння */
+.month-absences-counter::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
+    border-radius: 30px;
+    z-index: -1;
+    animation: absenceGlowRing 2s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .absences-icon {
-    font-size: 1.1rem;
-    animation: warningShake 4s ease-in-out infinite;
+    font-size: 1.2rem;
+    animation: warningShake 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.8));
+    display: inline-block;
 }
 
 .absences-count {
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-size: 1.3rem;
+    font-weight: 900;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        0 0 6px rgba(239, 68, 68, 0.5);
+    letter-spacing: 0.5px;
 }
 
 .absences-text {
-    font-size: 0.85rem;
-    opacity: 0.95;
+    font-size: 0.9rem;
+    opacity: 0.98;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .month-perfect {
@@ -1641,6 +1680,41 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     backdrop-filter: blur(10px);
 }
 
+/* НОВА ПОТУЖНА АНІМАЦІЯ СВІТІННЯ ДЛЯ БЕЙДЖУ ПРОПУСКІВ */
+@keyframes absenceBadgeGlow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 
+            0 6px 25px rgba(239, 68, 68, 0.6),
+            0 0 40px rgba(239, 68, 68, 0.5),
+            0 0 60px rgba(239, 68, 68, 0.3),
+            0 0 80px rgba(239, 68, 68, 0.2),
+            inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 
+            0 8px 35px rgba(239, 68, 68, 0.8),
+            0 0 60px rgba(239, 68, 68, 0.7),
+            0 0 90px rgba(239, 68, 68, 0.5),
+            0 0 120px rgba(239, 68, 68, 0.3),
+            inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Анімація зовнішнього кільця світіння */
+@keyframes absenceGlowRing {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 1;
+    }
+}
+
+/* Стара анімація для сумісності */
 @keyframes counterPulse {
     0%, 100% {
         transform: scale(1);
@@ -1851,7 +1925,7 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     box-shadow: 0 2px 6px rgba(99,102,241,0.2);
 }
 
-.calendar-day.today {
+.calendar-day.today:not(.has-absences) {
     box-shadow: inset 0 0 0 2px var(--primary-color);
     background-color: transparent;
 }
@@ -1870,32 +1944,38 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     animation: fadeInUp 0.6s ease-out, absenceGlow 2s ease-in-out 0.6s infinite;
 }
 
-/* Сегодняшній день з пропусками - ЧЕРВОНА ТЕМА */
+/* Сегодняшній день з пропусками - СИНІЙ З ЛЕГКИМ ПЕРЕХОДОМ У ФІОЛЕТОВИЙ/ЧЕРВОНИЙ */
 .calendar-day.today.has-absences {
-    /* Використовуємо червоний градієнт замість синього */
-    background: linear-gradient(135deg, 
-        rgba(239, 68, 68, 0.20), 
-        rgba(220, 38, 38, 0.15)) !important;
-    /* Червона рамка як у звичайних днів з пропуском */
-    border: 2px solid var(--danger-color) !important;
-    /* Червоне свічення як у звичайних днів */
-    box-shadow: 
-        0 0 20px rgba(239, 68, 68, 0.5),
-        0 0 40px rgba(239, 68, 68, 0.3),
-        inset 0 0 30px rgba(239, 68, 68, 0.15) !important;
-    /* Використовуємо тільки fadeInUp для послідовної появи */
-    animation: fadeInUp 0.6s ease-out, todayAbsenceGlow 3s ease-in-out 0.6s infinite;
+    /* Основний настрій - більш синій, червоний тільки як акцент внизу */
+    background: linear-gradient(135deg,
+        rgba(37, 99, 235, 0.42),
+        rgba(129, 140, 248, 0.34),
+        rgba(147, 51, 234, 0.28)) !important;
+    /* Холодна фіолетово-синя рамка */
+    border: 2px solid rgba(129, 140, 248, 0.9) !important;
+    /* Трохи зменшене свічення (менше радіус і прозорості) */
+    box-shadow:
+        0 0 22px rgba(129, 140, 248, 0.55),
+        0 0 38px rgba(147, 51, 234, 0.45),
+        0 0 52px rgba(37, 99, 235, 0.32),
+        0 0 68px rgba(88, 28, 135, 0.26),
+        inset 0 0 30px rgba(88, 28, 135, 0.22) !important;
+    /* Ті ж анімації, але з більш м'яким сяйвом знизу в @keyframes */
+    animation: fadeInUp 0.6s ease-out, todayAbsenceGlowMixed 3s ease-in-out 0.6s infinite !important;
 }
 
 .calendar-day.today.has-absences:hover {
     background: linear-gradient(135deg, 
-        rgba(239, 68, 68, 0.30), 
-        rgba(220, 38, 38, 0.25)) !important;
-    border: 2px solid var(--danger-color) !important;
+        rgba(99, 102, 241, 0.45), 
+        rgba(147, 51, 234, 0.42),
+        rgba(220, 38, 38, 0.38)) !important;
+    border: 2px solid rgba(147, 51, 234, 1) !important;
     box-shadow: 
-        0 0 30px rgba(239, 68, 68, 0.7),
-        0 0 50px rgba(239, 68, 68, 0.4),
-        inset 0 0 40px rgba(239, 68, 68, 0.25) !important;
+        0 0 40px rgba(147, 51, 234, 0.8),
+        0 0 65px rgba(220, 38, 38, 0.7),
+        0 0 85px rgba(99, 102, 241, 0.5),
+        0 0 105px rgba(147, 51, 234, 0.4),
+        inset 0 0 50px rgba(147, 51, 234, 0.35) !important;
     transform: translateY(-5px) scale(1.05);
     opacity: 1;
 }
@@ -1918,23 +1998,36 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     font-weight: 600;
 }
 
-/* Сегодняшний день с пропусками - красный текст */
+/* Сегодняшний день с пропусками - ЯСКРАВИЙ білий текст на градієнті */
 .calendar-day.today.has-absences .day-number {
-    color: var(--danger-color);
-    font-weight: 800;
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 
+        0 0 20px rgba(147, 51, 234, 1),
+        0 0 10px rgba(220, 38, 38, 0.6),
+        0 3px 8px rgba(0, 0, 0, 0.5) !important;
+    background: none !important;
+    filter: brightness(1.1);
 }
 
-/* ВАЖНО: День недели красный вместо синего */
+/* День тижня - ЯСКРАВИЙ білий текст */
 .calendar-day.today.has-absences .day-header {
-    color: var(--danger-color) !important;
-    border-bottom-color: rgba(239, 68, 68, 0.3);
-    font-weight: 600;
+    color: #ffffff !important;
+    border-bottom-color: rgba(255, 255, 255, 0.4) !important;
+    font-weight: 700 !important;
+    text-shadow: 
+        0 0 15px rgba(147, 51, 234, 0.9),
+        0 0 8px rgba(220, 38, 38, 0.5),
+        0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .calendar-day.today.has-absences .day-classes {
-    color: rgba(239, 68, 68, 0.8);
+    color: #ffffff !important;
     font-weight: 600;
+    text-shadow: 
+        0 0 12px rgba(147, 51, 234, 0.8),
+        0 0 6px rgba(220, 38, 38, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Consistent day styling for both views */
@@ -1970,19 +2063,39 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     }
 }
 
-/* Специальное свечение для сегодняшнего дня с пропусками */
+/* Змішане синьо-фіолетове свічення для сьогоднішнього дня з пропусками (трохи слабше) */
+@keyframes todayAbsenceGlowMixed {
+    0%, 100% {
+        box-shadow:
+            0 0 22px rgba(129, 140, 248, 0.55),
+            0 0 36px rgba(147, 51, 234, 0.4),
+            0 0 50px rgba(37, 99, 235, 0.28),
+            inset 0 0 26px rgba(88, 28, 135, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(129, 140, 248, 0.75),
+            0 0 48px rgba(147, 51, 234, 0.55),
+            0 0 64px rgba(37, 99, 235, 0.4),
+            inset 0 0 34px rgba(88, 28, 135, 0.26);
+    }
+}
+
+/* Старе червоне свічення для сумісності */
 @keyframes todayAbsenceGlow {
     0%, 100% {
         box-shadow: 
-            0 0 20px rgba(239, 68, 68, 0.5),
-            0 0 40px rgba(239, 68, 68, 0.3),
-            inset 0 0 30px rgba(239, 68, 68, 0.15);
+            0 0 25px rgba(239, 68, 68, 0.6),
+            0 0 45px rgba(239, 68, 68, 0.4),
+            0 0 65px rgba(239, 68, 68, 0.2),
+            inset 0 0 35px rgba(239, 68, 68, 0.18);
     }
     50% {
         box-shadow: 
-            0 0 30px rgba(239, 68, 68, 0.7),
-            0 0 50px rgba(239, 68, 68, 0.4),
-            inset 0 0 40px rgba(239, 68, 68, 0.25);
+            0 0 35px rgba(239, 68, 68, 0.8),
+            0 0 60px rgba(239, 68, 68, 0.6),
+            0 0 85px rgba(239, 68, 68, 0.3),
+            inset 0 0 45px rgba(239, 68, 68, 0.25);
     }
 }
 
@@ -2243,6 +2356,21 @@ body.bottom-nav-enabled .menu-toggle { display: none !important; }
     opacity: 1;
     visibility: visible;
     background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-open #mainContent,
+.modal-open .content-section,
+.modal-open .header,
+.modal-open .bottom-nav,
+.modal-open .calendar-container {
+    filter: blur(10px);
+    transition: filter 0.35s ease;
+    pointer-events: none;
+}
+
+.modal-open #mainContent,
+.modal-open body {
+    overflow: hidden;
 }
 
 .modal {
@@ -6706,8 +6834,8 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
         background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08)) !important;
         border: 2px solid var(--danger-color) !important;
         box-shadow: 
-            0 4px 12px rgba(239, 68, 68, 0.25) !important,
-            0 0 20px rgba(239, 68, 68, 0.15) !important,
+            0 4px 12px rgba(239, 68, 68, 0.25),
+            0 0 20px rgba(239, 68, 68, 0.15),
             0 2px 6px rgba(220, 38, 38, 0.1) !important;
     }
     
@@ -6747,6 +6875,7 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     /* Исправление проблем с клавиатурой на iOS */
     input, textarea, select {
         -webkit-appearance: none;
+        appearance: none;
         border-radius: 0;
     }
     
@@ -6782,9 +6911,9 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     .calendar-day:active {
         transform: scale(0.96) translateY(2px) !important;
         box-shadow: 
-            0 6px 25px rgba(99, 102, 241, 0.4) !important,
-            0 2px 10px rgba(0, 0, 0, 0.2) !important,
-            0 0 20px rgba(99, 102, 241, 0.3) !important,
+            0 6px 25px rgba(99, 102, 241, 0.4),
+            0 2px 10px rgba(0, 0, 0, 0.2),
+            0 0 20px rgba(99, 102, 241, 0.3),
             inset 0 2px 0 rgba(255, 255, 255, 0.25) !important;
         border-color: var(--primary-color) !important;
         background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1)) !important;
@@ -6799,25 +6928,69 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
             0 0 10px rgba(99, 102, 241, 0.3);
     }
     
-    .calendar-day.today {
+    .calendar-day.today:not(.has-absences) {
         border-color: var(--primary-color) !important;
         box-shadow: 
-            0 0 0 3px rgba(99, 102, 241, 0.4) !important,
-            0 0 25px rgba(99, 102, 241, 0.3) !important,
-            0 6px 20px rgba(99, 102, 241, 0.25) !important,
-            0 0 40px rgba(99, 102, 241, 0.15) !important,
+            0 0 0 3px rgba(99, 102, 241, 0.4),
+            0 0 25px rgba(99, 102, 241, 0.3),
+            0 6px 20px rgba(99, 102, 241, 0.25),
+            0 0 40px rgba(99, 102, 241, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
         background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.12)) !important;
         animation: todayGlow 3s ease-in-out infinite;
     }
 
-    .calendar-day.today .day-number {
+    .calendar-day.today:not(.has-absences) .day-number {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: white;
         box-shadow: 
             0 4px 15px rgba(99, 102, 241, 0.4),
             0 0 15px rgba(99, 102, 241, 0.3),
             0 2px 8px rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Мобільні стилі для сьогоднішнього дня З пропусками - ЯСКРАВИЙ синьо-червоний градієнт */
+    .calendar-day.today.has-absences {
+        background: linear-gradient(135deg, 
+            rgba(99, 102, 241, 0.32), 
+            rgba(147, 51, 234, 0.30),
+            rgba(220, 38, 38, 0.26)) !important;
+        border: 2px solid rgba(147, 51, 234, 0.85) !important;
+        box-shadow: 
+            0 0 25px rgba(147, 51, 234, 0.65),
+            0 0 45px rgba(220, 38, 38, 0.55),
+            0 0 65px rgba(99, 102, 241, 0.35),
+            0 0 80px rgba(147, 51, 234, 0.25),
+            inset 0 0 30px rgba(147, 51, 234, 0.2) !important;
+        animation: fadeInUp 0.6s ease-out, todayAbsenceGlowMixed 3s ease-in-out 0.6s infinite !important;
+    }
+    
+    .calendar-day.today.has-absences .day-number {
+        color: #ffffff !important;
+        background: none !important;
+        font-weight: 900 !important;
+        text-shadow: 
+            0 0 18px rgba(147, 51, 234, 0.95),
+            0 0 8px rgba(220, 38, 38, 0.5),
+            0 2px 6px rgba(0, 0, 0, 0.45) !important;
+        filter: brightness(1.1);
+    }
+    
+    .calendar-day.today.has-absences .day-header {
+        color: #ffffff !important;
+        border-bottom-color: rgba(255, 255, 255, 0.4) !important;
+        text-shadow: 
+            0 0 12px rgba(147, 51, 234, 0.85),
+            0 0 6px rgba(220, 38, 38, 0.4),
+            0 2px 4px rgba(0, 0, 0, 0.35);
+    }
+    
+    .calendar-day.today.has-absences .day-classes {
+        color: #ffffff !important;
+        text-shadow: 
+            0 0 10px rgba(147, 51, 234, 0.75),
+            0 0 5px rgba(220, 38, 38, 0.35),
+            0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .day-absence-badge::before {
@@ -6828,7 +7001,6 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     .calendar-day {
         touch-action: manipulation;
         -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
-        tap-highlight-color: rgba(99, 102, 241, 0.2);
         cursor: pointer;
         user-select: none;
         -webkit-user-select: none;
@@ -6869,6 +7041,39 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     
     .month-header::before {
         display: none !important;
+    }
+    
+    /* Оптимізація бейджу пропусків для мобільних */
+    .month-absences-counter {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.85rem;
+        /* Менше світіння для кращої продуктивності на мобільних */
+        box-shadow: 
+            0 4px 20px rgba(239, 68, 68, 0.5),
+            0 0 30px rgba(239, 68, 68, 0.4),
+            0 0 50px rgba(239, 68, 68, 0.25),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        animation: absenceBadgeGlowMobile 2.5s ease-in-out infinite;
+    }
+    
+    .month-absences-counter::before {
+        inset: -6px;
+        animation: absenceGlowRingMobile 2.5s ease-in-out infinite;
+    }
+    
+    .absences-icon {
+        font-size: 1rem;
+        /* Простіша анімація для мобільних */
+        animation: warningShake 4s ease-in-out infinite;
+        filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.6));
+    }
+    
+    .absences-count {
+        font-size: 1.1rem;
+    }
+    
+    .absences-text {
+        font-size: 0.8rem;
     }
     
     /* Оптимизация модальных окон */
@@ -6953,7 +7158,7 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
         border-color: var(--primary-color) !important;
         outline: none;
         box-shadow: 
-            0 0 0 4px rgba(99, 102, 241, 0.15) !important,
+            0 0 0 4px rgba(99, 102, 241, 0.15),
             0 4px 15px rgba(99, 102, 241, 0.1) !important;
         background: white !important;
         transform: translateY(-1px);
@@ -7166,19 +7371,50 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     @keyframes todayGlow {
         0%, 100% {
             box-shadow: 
-                0 0 0 3px rgba(99, 102, 241, 0.4) !important,
-                0 0 25px rgba(99, 102, 241, 0.3) !important,
-                0 6px 20px rgba(99, 102, 241, 0.25) !important,
-                0 0 40px rgba(99, 102, 241, 0.15) !important,
-                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+                0 0 0 3px rgba(99, 102, 241, 0.4),
+                0 0 25px rgba(99, 102, 241, 0.3),
+                0 6px 20px rgba(99, 102, 241, 0.25),
+                0 0 40px rgba(99, 102, 241, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         50% {
             box-shadow: 
-                0 0 0 3px rgba(99, 102, 241, 0.6) !important,
-                0 0 30px rgba(99, 102, 241, 0.4) !important,
-                0 8px 25px rgba(99, 102, 241, 0.35) !important,
-                0 0 50px rgba(99, 102, 241, 0.25) !important,
-                inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+                0 0 0 3px rgba(99, 102, 241, 0.6),
+                0 0 30px rgba(99, 102, 241, 0.4),
+                0 8px 25px rgba(99, 102, 241, 0.35),
+                0 0 50px rgba(99, 102, 241, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+    }
+    
+    /* Оптимізовані анімації для мобільних бейджів пропусків */
+    @keyframes absenceBadgeGlowMobile {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 
+                0 4px 20px rgba(239, 68, 68, 0.5),
+                0 0 30px rgba(239, 68, 68, 0.4),
+                0 0 50px rgba(239, 68, 68, 0.25),
+                inset 0 1px 1px rgba(255, 255, 255, 0.12);
+        }
+        50% {
+            transform: scale(1.03);
+            box-shadow: 
+                0 6px 25px rgba(239, 68, 68, 0.65),
+                0 0 40px rgba(239, 68, 68, 0.55),
+                0 0 60px rgba(239, 68, 68, 0.35),
+                inset 0 1px 2px rgba(255, 255, 255, 0.18);
+        }
+    }
+    
+    @keyframes absenceGlowRingMobile {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.8;
         }
     }
     
@@ -8862,5 +9098,145 @@ button, .btn, input, select, textarea, .nav-btn, .attendance-btn, .theme-btn,
     .theme-btn {
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* ========== НОВІ ПОКРАЩЕНІ АНІМАЦІЇ ========== */
+
+/* Плавна поява днів календаря для мобільних */
+@keyframes mobileSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Анімація появи модального вікна з пружним ефектом */
+@keyframes modalBounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05) translateY(-10px);
+    }
+    70% {
+        transform: scale(0.95) translateY(5px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Плавна поява header зверху */
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анімація натискання кнопки */
+@keyframes buttonPress {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Плавне світіння для важливих елементів */
+@keyframes smoothGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+    }
+}
+
+/* Пульсація для індикаторів */
+@keyframes gentlePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Анімація завантаження/обробки */
+@keyframes loadingSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ефект хвилі для touch взаємодій */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Плавне зникнення */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Анімація тремтіння для помилок */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Анімація success підтвердження */
+@keyframes successBounce {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }

@@ -406,17 +406,14 @@ class ScheduleApp {
         document.getElementById('reset-schedule-btn')?.addEventListener('click', () => {
             this.resetToDefaultSchedule();
         });
-        
-    }
 
-    handleResize() {
+    handleResize()
         this.isMobile = window.innerWidth <= 768;
         if (!this.isMobile) {
             this.closeMobileMenu();
         }
-    }
 
-    updateCurrentDate() {
+    updateCurrentDate()
         try {
             const currentDateElement = document.getElementById('currentDate');
             if (currentDateElement) {
@@ -432,17 +429,15 @@ class ScheduleApp {
         } catch (error) {
             console.error('Error updating current date:', error);
         }
-    }
 
-    navigateWeek(direction) {
+    navigateWeek(direction)
         this.currentWeek.setDate(this.currentWeek.getDate() + (direction * 7));
         // Regenerate schedule for new week
         this.sampleSchedule = this.generateWeekSchedule(this.currentWeek);
         this.renderCalendar();
         this.animateNavigation(direction);
-    }
 
-    animateNavigation(direction) {
+    animateNavigation(direction)
         const calendar = document.getElementById('calendarGrid');
         if (calendar) {
             calendar.style.transform = `translateX(${direction * 10}px)`;
@@ -453,9 +448,8 @@ class ScheduleApp {
                 calendar.style.opacity = '1';
             }, 150);
         }
-    }
 
-    renderCalendar() {
+    renderCalendar()
         try {
             const grid = this.getElement('calendarGrid');
             const weekTitle = this.getElement('weekTitle');
@@ -523,9 +517,8 @@ class ScheduleApp {
         } catch (error) {
             console.error('Error rendering calendar:', error);
         }
-    }
 
-    createDayElement(date, dayName, index = 0) {
+    createDayElement(date, dayName, index = 0)
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
         dayElement.style.animationDelay = `${index * 0.08}s`;
@@ -731,7 +724,7 @@ class ScheduleApp {
         this.trapFocus(modal);
     }
 
-    renderScheduleDetails(container, schedule, dateKey) {
+    renderScheduleDetails(container, schedule, dateKey)
         const detailsDiv = document.createElement('div');
         detailsDiv.className = 'schedule-details';
         
@@ -822,7 +815,7 @@ class ScheduleApp {
             text-align: center;
             border-top: 1px solid var(--border-color);
         `;
-        
+        {
         clearDayDiv.innerHTML = `
             <button class="clear-day-btn" data-date-key="${dateKey}" style="
                 background: var(--danger-color);
@@ -1451,7 +1444,7 @@ class ScheduleApp {
     }
     
     // Initialize schedule editor functionality
-    initializeScheduleEditor(modalOverlay) {
+    initializeScheduleEditor(modalOverlay)
         // Tab switching
         const tabBtns = modalOverlay.querySelectorAll('.tab-btn');
         const tabContents = modalOverlay.querySelectorAll('.tab-content');
